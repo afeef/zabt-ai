@@ -27,12 +27,23 @@ def client() -> Generator[TestClient, None, None]:
 
 @pytest.fixture(scope="function", autouse=True)
 def create_test_user(db: Session):
+    from sqlalchemy import text
     from app.models import User
     user = db.get(User, 1)
     if not user:
         user = User(id=1, email="test@example.com", supabase_id="mock_supabase_uuid", full_name="Test User")
         db.add(user)
         db.commit()
+    # The user above is inserted with an explicit id=1, which does NOT advance the
+    # Postgres identity sequence. Keep the sequence ahead of the max id so tests that
+    # create users via autoincrement don't collide on the primary key.
+    db.execute(
+        text(
+            "SELECT setval(pg_get_serial_sequence('\"user\"', 'id'), "
+            "(SELECT COALESCE(MAX(id), 1) FROM \"user\"))"
+        )
+    )
+    db.commit()
 
 @pytest.fixture(scope="function")
 def normal_user_token_headers(client: TestClient, db: Session) -> Dict[str, str]:

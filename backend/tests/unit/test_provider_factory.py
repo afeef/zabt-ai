@@ -11,50 +11,12 @@ from app.models import UserTier
 
 @pytest.fixture(autouse=True)
 def reset_singletons():
-    """Reset lazy-initialised provider singleton between tests."""
+    """Reset the lazy-initialised provider singleton between tests."""
     import app.services.transcription.factory as factory_mod
 
-    factory_mod._whisper_provider = None
+    factory_mod._gpu_client = None
     yield
-    factory_mod._whisper_provider = None
-
-
-class TestGetProvider:
-    """Verify get_provider() always returns WhisperProvider."""
-
-    @patch("app.services.transcription.factory.settings")
-    def test_returns_whisper(self, mock_settings):
-        mock_settings.TRANSCRIPTION_DEVICE = "cpu"
-        mock_settings.WHISPER_MODEL = "base.en"
-        mock_settings.HF_AUTH_TOKEN = ""
-
-        with patch("app.services.transcription.whisper_provider.torch") as mock_torch:
-            mock_torch.cuda.is_available.return_value = False
-            with patch(
-                "app.services.transcription.whisper_provider.settings", mock_settings
-            ):
-                from app.services.transcription.factory import get_provider
-
-                provider = get_provider()
-
-        assert provider.get_provider_name() == "whisper"
-
-    @patch("app.services.transcription.factory.settings")
-    def test_user_tier_does_not_change_provider(self, mock_settings):
-        mock_settings.TRANSCRIPTION_DEVICE = "cpu"
-        mock_settings.WHISPER_MODEL = "base.en"
-        mock_settings.HF_AUTH_TOKEN = ""
-
-        with patch("app.services.transcription.whisper_provider.torch") as mock_torch:
-            mock_torch.cuda.is_available.return_value = False
-            with patch(
-                "app.services.transcription.whisper_provider.settings", mock_settings
-            ):
-                from app.services.transcription.factory import get_provider
-
-                for tier in [UserTier.FREE, UserTier.PRO, UserTier.ENTERPRISE, None]:
-                    provider = get_provider(user_tier=tier)
-                    assert provider.get_provider_name() == "whisper"
+    factory_mod._gpu_client = None
 
 
 class TestBuildConfig:
