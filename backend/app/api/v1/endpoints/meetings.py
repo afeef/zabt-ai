@@ -296,13 +296,13 @@ def delete_meeting(
     meeting = meeting_service.get_meeting(meeting_id)
     if not meeting:
         raise HTTPException(status_code=404, detail="Meeting not found")
-        
+
     if meeting.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
-        
+
     if meeting.status in ["processing", "queued"]:
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail="Cannot delete a meeting while it is processing."
         )
 

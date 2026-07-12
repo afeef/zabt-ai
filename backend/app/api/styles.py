@@ -22,12 +22,12 @@ async def upload_style_examples(files: List[UploadFile] = File(...)):
         for file in files:
             if not file.filename.lower().endswith('.pdf'):
                 continue
-                
+
             file_location = STYLES_DIR / file.filename
             with open(file_location, "wb+") as file_object:
                 shutil.copyfileobj(file.file, file_object)
             saved_files.append(file.filename)
-            
+
         return saved_files
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -48,7 +48,7 @@ def get_all_style_text() -> str:
     """
     if not STYLES_DIR.exists():
         return ""
-        
+
     all_text = ""
     for pdf_path in STYLES_DIR.glob("*.pdf"):
         try:
@@ -56,10 +56,10 @@ def get_all_style_text() -> str:
             reader = pypdf.PdfReader(pdf_path)
             for page in reader.pages:
                 text += page.extract_text() + "\n"
-            
+
             if text.strip():
                 all_text += f"\n--- Example Style (from {pdf_path.name}) ---\n{text}\n"
         except Exception as e:
             print(f"Error reading style file {pdf_path}: {e}")
-            
+
     return all_text

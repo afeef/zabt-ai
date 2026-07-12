@@ -13,7 +13,6 @@ import time
 from dataclasses import dataclass
 from typing import Any, Callable, Dict
 
-import sentry_sdk
 
 from src.logging import get_logger
 
@@ -167,7 +166,6 @@ def _transcribe_medasr(
     """
     import torch
     import librosa
-    import numpy as np
 
     if on_status_change:
         on_status_change("transcribing")

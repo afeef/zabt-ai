@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # Copyright (C) 2025-2026 Afeef Janjua
 import httpx
-from jose import jwt, JWTError, jwk
-from jose.utils import base64url_decode
+from jose import jwt, JWTError
 from fastapi import HTTPException, status, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.core.config import settings

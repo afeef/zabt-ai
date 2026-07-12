@@ -4,7 +4,7 @@ import json
 import logging
 from dataclasses import asdict
 from pathlib import Path
-from typing import Annotated, Any, Dict, List
+from typing import Annotated, Any, Dict
 
 import typer
 from rich.console import Console

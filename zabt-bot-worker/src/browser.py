@@ -12,7 +12,6 @@ import tempfile
 
 from playwright.async_api import Page, Browser, async_playwright, TimeoutError as PwTimeout
 
-from src.config import settings
 from src.logging import get_logger
 
 logger = get_logger(__name__)
@@ -80,7 +79,7 @@ async def _take_screenshot(page: Page, step: str, job_id: str) -> str:
 async def launch_browser(session_env: dict) -> tuple:
     """Launch Playwright Chromium with the session's display + audio env. Returns (playwright, browser)."""
     logger.info("launch_browser: DISPLAY=%s", session_env.get("DISPLAY"))
-    
+
     pw = await async_playwright().start()
     browser = await pw.chromium.launch(
         headless=False,  # Must be headful for WebRTC audio
@@ -97,9 +96,9 @@ async def join_teams_meeting(
     browser: Browser, join_url: str, display_name: str, job_id: str
 ) -> Page:
     """Navigate through the Teams web client join flow. Returns the meeting page."""
-    logger.info("join_teams_meeting: job_id=%s display_name=%s url_preview=%.50s", 
+    logger.info("join_teams_meeting: job_id=%s display_name=%s url_preview=%.50s",
                 job_id, display_name, join_url[:50])
-    
+
     page = await browser.new_page()
     await page.set_viewport_size({"width": 1280, "height": 720})
 

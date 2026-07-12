@@ -10,16 +10,16 @@ import json
 class AuditMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         start_time = time.time()
-        
-        # Extract user ID if available (needs to be after auth middleware, 
-        # but Starlette middleware runs before endpoint dependencies. 
+
+        # Extract user ID if available (needs to be after auth middleware,
+        # but Starlette middleware runs before endpoint dependencies.
         # So we might not have user in request.state yet unless we use a custom AuthMiddleware)
         # For now, we log path, method, IP.
-        
+
         response = await call_next(request)
-        
+
         process_time = time.time() - start_time
-        
+
         log_entry = {
             "timestamp": time.time(),
             "method": request.method,
@@ -28,7 +28,7 @@ class AuditMiddleware(BaseHTTPMiddleware):
             "client_ip": request.client.host if request.client else "unknown",
             "duration_ms": round(process_time * 1000, 2)
         }
-        
+
         print(f"AUDIT_LOG: {json.dumps(log_entry)}")
-        
+
         return response

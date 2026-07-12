@@ -47,7 +47,7 @@ def run_verification():
     print("\n3. Uploading Style PDF...")
     with open("dummy_style.pdf", "wb") as f:
         f.write(b"%PDF-1.4 mock pdf content")
-    
+
     files = {"files": ("dummy_style.pdf", open("dummy_style.pdf", "rb"), "application/pdf")}
     resp = requests.post(f"{API_URL}/styles/upload", files=files, headers=headers)
     if resp.status_code == 200:
@@ -59,7 +59,7 @@ def run_verification():
     print("\n4. Uploading Meeting Audio...")
     with open("dummy_meeting.mp3", "wb") as f:
         f.write(b"ID3 mock audio content")
-    
+
     files = {"file": ("dummy_meeting.mp3", open("dummy_meeting.mp3", "rb"), "audio/mpeg")}
     resp = requests.post(f"{API_URL}/upload", files=files, headers=headers)
     if resp.status_code == 200:

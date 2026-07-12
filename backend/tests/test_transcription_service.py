@@ -21,7 +21,7 @@ def test_transcription_service_initialization_cpu_fallback(mock_load, mock_cuda,
     and falls back to CPU cleanly when device setting is 'auto'.
     """
     mock_settings.TRANSCRIPTION_DEVICE = "auto"
-    
+
     service = TranscriptionService()
     assert service.device == "cpu"
     assert mock_cuda.called
@@ -33,7 +33,7 @@ def test_transcription_service_initialization_gpu(mock_load, mock_cuda, mock_set
     Test that the TranscriptionService binds 'cuda' when available.
     """
     mock_settings.TRANSCRIPTION_DEVICE = "auto"
-    
+
     service = TranscriptionService()
     assert service.device == "cuda"
     assert mock_cuda.called

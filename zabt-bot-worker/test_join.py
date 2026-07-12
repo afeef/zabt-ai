@@ -40,7 +40,7 @@ async def main():
         env["DISPLAY"] = ":99"
         await asyncio.sleep(1)
 
-    print(f"Launching browser...")
+    print("Launching browser...")
     pw, browser = await launch_browser(env)
 
     try:

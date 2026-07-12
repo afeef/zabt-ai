@@ -1,0 +1,28 @@
+# Ruff configuration for zabt.ai.
+#
+# Initial public-release baseline: real-bug rules (pyflakes F-codes, undefined names,
+# redefinitions) are enforced. A few pre-existing stylistic categories are ignored for now
+# and will be tightened over time. Import sorting (I) is intentionally not enabled yet to
+# avoid a large churn diff on the first release.
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = ["E", "F", "W"]
+ignore = [
+  "E501",  # line-too-long — the formatter owns line length; not enforced as a lint error
+  "W291",  # trailing whitespace — formatter territory
+  "W293",  # whitespace on blank line — formatter territory
+  "E402",  # module-import-not-at-top — settings/scripts adjust sys.path/env before importing
+  "E701",  # multiple statements on one line (colon)
+  "E702",  # multiple statements on one line (semicolon) — used in some scripts
+  "E712",  # comparison to True/False
+  "E722",  # bare except (pre-existing; tracked for cleanup)
+  "F841",  # unused local variable (pre-existing; tracked for cleanup)
+]
+
+[lint.per-file-ignores]
+"__init__.py" = ["F401"]                 # re-exports
+"**/conftest.py" = ["F401", "F811"]      # pytest fixtures look "unused"
+"backend/tests/**" = ["F401", "F811"]
+"backend/alembic/**" = ["F401", "E402"]  # generated migration scaffolding

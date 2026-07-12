@@ -16,7 +16,7 @@ from fastapi import FastAPI
 
 from src.config import settings
 from src.logging import get_logger
-from src.models import TranscriptionJobInput, TranscriptionJobStatus, TranscriptionResult
+from src.models import TranscriptionJobInput
 from src.pipeline import PipelineConfig, format_result, run_pipeline
 
 logger = get_logger(__name__)

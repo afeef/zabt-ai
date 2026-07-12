@@ -9,7 +9,7 @@ def test_upload_meeting_file(client: TestClient, db: Session, normal_user_token_
     filename = "test_audio.mp3"
     with open(filename, "wb") as f:
         f.write(b"dummy audio content")
-        
+
     try:
         with open(filename, "rb") as f:
             response = client.post(
@@ -18,13 +18,13 @@ def test_upload_meeting_file(client: TestClient, db: Session, normal_user_token_
                 files={"file": (filename, f, "audio/mpeg")},
                 data={"title": "Upload Test"}
             )
-            
+
         assert response.status_code == 200
         content = response.json()
         assert content["title"] == "Upload Test"
         assert content["status"] == "queued"
         assert "id" in content
-        
+
     finally:
         if os.path.exists(filename):
             os.remove(filename)

@@ -5,7 +5,7 @@ from typing import List, Optional
 from sqlalchemy import func
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
-from app.models import Meeting, MeetingCreate, MeetingRead, TranscriptSegment, TranscriptionType
+from app.models import Meeting, MeetingCreate, TranscriptSegment, TranscriptionType
 from app.core.config import settings
 from app.db.engine import engine
 from app.services.base import BaseService

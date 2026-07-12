@@ -94,7 +94,7 @@ def extract_metadata(url: str) -> dict:
     if result.returncode != 0:
         stderr = result.stderr.lower()
         _raise_for_stderr(stderr)
-        
+
         logger.error(f"yt-dlp extraction failed: {result.stderr.strip()}")
         raise YouTubeError(
             f"Failed to fetch video metadata. Please check the URL and try again. Details: {result.stderr.strip()}"

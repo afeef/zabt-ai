@@ -4,7 +4,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Optional
 
-from cryptography.fernet import Fernet, InvalidToken
+from cryptography.fernet import Fernet
 from sqlmodel import Session, select
 
 from app.core.config import settings

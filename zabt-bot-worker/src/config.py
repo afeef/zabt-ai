@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     SENTRY_DSN: str = ""
     SENTRY_ENVIRONMENT: str = "production"
     LOGFIRE_TOKEN: str = ""
-    
+
     # PostHog analytics
     POSTHOG_API_KEY: str = ""
     POSTHOG_HOST: str = "https://app.posthog.com"

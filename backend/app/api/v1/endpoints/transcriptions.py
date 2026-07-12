@@ -1,10 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # Copyright (C) 2025-2026 Afeef Janjua
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, Query
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from app.services.transcription import get_provider
 from app.services.meeting import meeting_service
-from app.core.security import verify_token
-from app.models import User
 import time
 
 router = APIRouter()

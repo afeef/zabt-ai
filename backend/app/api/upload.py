@@ -5,8 +5,7 @@ import os
 from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from sqlmodel import Session
-from app.models import Meeting, MeetingRead, User
-from app.core.config import settings
+from app.models import Meeting, MeetingRead
 from app.api import deps
 
 # Temporary mock for current user
@@ -29,15 +28,15 @@ async def upload_meeting(
     try:
         # Create a unique filename
         file_location = UPLOAD_DIR / file.filename
-        
+
         # Save file to disk
         with open(file_location, "wb+") as file_object:
             shutil.copyfileobj(file.file, file_object)
-            
+
         # Create DB entry
         # owner_id = current_user.id
         owner_id = 1 # Mock
-        
+
         meeting = Meeting(
             title=file.filename,
             file_path=str(file_location),
@@ -47,9 +46,9 @@ async def upload_meeting(
         db.add(meeting)
         db.commit()
         db.refresh(meeting)
-        
+
         return meeting
 
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

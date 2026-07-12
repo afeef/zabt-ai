@@ -8,6 +8,7 @@ import uuid
 from threading import Lock
 
 import httpx
+import logfire
 from fastapi import FastAPI
 
 from src.config import settings
@@ -67,7 +68,7 @@ def health():
 @app.post("/jobs")
 async def create_job(input: BotJobInput):
     job_id = str(uuid.uuid4())
-    
+
     logger.info(
         "create_job: event_id=%s bot_job_id=%s join_url_preview=%.50s callback_url=%s",
         input.event_id,
@@ -75,7 +76,7 @@ async def create_job(input: BotJobInput):
         input.join_url[:50] if input.join_url else None,
         input.callback_url,
     )
-    
+
     with _jobs_lock:
         _jobs[job_id] = {
             "status": "queued",
@@ -88,7 +89,7 @@ async def create_job(input: BotJobInput):
     task.add_done_callback(lambda t: t.exception() if not t.cancelled() else None)
 
     logger.debug("create_job: job_id=%s queued", job_id)
-    
+
     # Capture PostHog event
     capture_event("bot_job_created", {
         "event_id": input.event_id,
@@ -96,7 +97,7 @@ async def create_job(input: BotJobInput):
         "job_id": job_id,
         "worker_id": settings.WORKER_ID,
     })
-    
+
     return BotJobStatus(id=job_id, status="queued")
 
 
@@ -121,16 +122,16 @@ async def _run_job(job_id: str, input: BotJobInput) -> None:
     browser = None
 
     try:
-        with logfire.span("run_bot_job job_id={job_id} event_id={event_id}", 
+        with logfire.span("run_bot_job job_id={job_id} event_id={event_id}",
                           job_id=job_id, event_id=input.event_id):
-            
+
             logger.debug("Running job %s for event_id=%s", job_id, input.event_id)
-            
+
             # 1. Create meeting session (Xvfb + PulseAudio)
             _update_status(job_id, "joining")
             session = MeetingSession(job_id)
             session.start()
-            logger.debug("Meeting session started: display=%s audio_path=%s", 
+            logger.debug("Meeting session started: display=%s audio_path=%s",
                         session.display_env.get("DISPLAY"), session.audio_path)
 
             # 2. Launch browser on the session's display + audio sink
@@ -191,7 +192,7 @@ async def _run_job(job_id: str, input: BotJobInput) -> None:
             # 9. Callback to main backend
             logger.info("Sending callback for job %s to %s", job_id, input.callback_url)
             await _send_callback(input.callback_url, result)
-            
+
             # Capture PostHog event on completion
             capture_event("bot_job_completed", {
                 "event_id": input.event_id,
@@ -211,7 +212,7 @@ async def _run_job(job_id: str, input: BotJobInput) -> None:
             input.bot_job_id,
             str(e)[:200],
         )
-        
+
         # Capture PostHog event on failure
         capture_event("bot_job_failed", {
             "event_id": input.event_id,
@@ -220,7 +221,7 @@ async def _run_job(job_id: str, input: BotJobInput) -> None:
             "worker_id": settings.WORKER_ID,
             "error": str(e)[:500],
         })
-        
+
         _update_status(job_id, "failed", error=str(e))
 
         result = BotJobResult(
@@ -256,7 +257,7 @@ async def _run_job(job_id: str, input: BotJobInput) -> None:
 async def _send_callback(callback_url: str, result: BotJobResult) -> None:
     """Send result callback to the main backend with retry."""
     url = callback_url  # Already a full URL from the orchestration service
-    
+
     logger.debug(
         "Sending callback: event_id=%s bot_job_id=%s status=%s audio_url=%s",
         result.event_id,
@@ -264,10 +265,10 @@ async def _send_callback(callback_url: str, result: BotJobResult) -> None:
         result.status,
         result.audio_url or "",
     )
-    
+
     for attempt in range(3):
         try:
-            with logfire.span("send_callback_attempt attempt={attempt} event_id={event_id}", 
+            with logfire.span("send_callback_attempt attempt={attempt} event_id={event_id}",
                               attempt=attempt + 1, event_id=result.event_id):
                 async with httpx.AsyncClient(timeout=30) as client:
                     resp = await client.post(url, json=result.model_dump())
@@ -277,7 +278,7 @@ async def _send_callback(callback_url: str, result: BotJobResult) -> None:
                         result.event_id,
                         resp.status_code,
                     )
-                    
+
                     # Capture PostHog callback success event
                     if resp.status_code == 200:
                         capture_event("callback_sent_successfully", {
@@ -286,7 +287,7 @@ async def _send_callback(callback_url: str, result: BotJobResult) -> None:
                             "worker_id": settings.WORKER_ID,
                             "attempt": attempt + 1,
                         })
-                    
+
                     return
         except Exception as e:
             if attempt < 2:
@@ -305,7 +306,7 @@ async def _send_callback(callback_url: str, result: BotJobResult) -> None:
                     result.event_id,
                     url,
                 )
-                
+
                 # Capture PostHog callback failure event
                 capture_event("callback_failed", {
                     "event_id": result.event_id,

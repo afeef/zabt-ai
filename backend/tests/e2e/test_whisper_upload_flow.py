@@ -12,14 +12,14 @@ def test_whisper_upload_fallback_flow(page: Page):
     """
     # 1. Navigate to frontend
     page.goto("http://localhost:3000/dashboard")
-    
+
     # Placeholder for actual UI interaction sequence:
     # page.locator("button:has-text('Upload Meeting')").click()
     # page.locator("input[type='file']").set_input_files("test_audio.mp3")
     # page.locator("button:has-text('Submit')").click()
-    
+
     # 2. Wait for transcription to hit the queue
     # expect(page.locator(".status-text")).to_contain_text("Processing", timeout=10000)
-    
+
     # 3. Assert completion and diarized blocks exist
     # expect(page.locator(".status-text")).to_contain_text("Completed", timeout=60000)

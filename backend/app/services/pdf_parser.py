@@ -26,7 +26,7 @@ class PDFParser:
         examples = []
         if not examples_dir.exists():
             return []
-            
+
         for file in examples_dir.glob("*.pdf"):
             try:
                 text = PDFParser.extract_text(file)

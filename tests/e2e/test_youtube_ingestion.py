@@ -14,7 +14,6 @@ Run:
 """
 
 import os
-import pytest
 from playwright.sync_api import Page, expect
 
 BASE_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")

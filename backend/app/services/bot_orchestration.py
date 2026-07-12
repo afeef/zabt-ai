@@ -29,7 +29,7 @@ class BotOrchestrationService:
             calendar_event.join_url[:50] if calendar_event.join_url else None,
             calendar_event.auto_join,
         )
-        
+
         if not calendar_event.join_url:
             raise ValueError(f"CalendarEvent {calendar_event.id} has no join_url")
 
@@ -60,7 +60,7 @@ class BotOrchestrationService:
                 self.bot_worker_url,
                 calendar_event.id,
             )
-            
+
             async with httpx.AsyncClient(timeout=30.0) as client:
                 resp = await client.post(
                     f"{self.bot_worker_url}/jobs",
@@ -73,7 +73,7 @@ class BotOrchestrationService:
                 "dispatch_bot: bot worker response worker_instance_id=%s",
                 data.get("worker_instance_id"),
             )
-            
+
             # 3. Update BotJob with worker_instance_id
             with Session(engine) as session:
                 job = session.get(BotJob, bot_job.id)
@@ -197,7 +197,6 @@ class BotOrchestrationService:
     ) -> None:
         """Create a Meeting record from bot recording and dispatch the transcription pipeline."""
         from app.models import Meeting
-        from app.services.meeting import meeting_service
 
         with Session(engine) as session:
             event = session.get(CalendarEvent, calendar_event_id)

@@ -3,7 +3,7 @@
 from typing import List, Any
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from app.api import deps
-from app.models import StyleProfile, StyleProfileCreate, User, StyleProfileRead
+from app.models import StyleProfileCreate, User, StyleProfileRead
 from app.services.styles import style_service, STYLES_DIR
 import shutil
 
@@ -41,12 +41,12 @@ async def upload_style_pdf(
     """
     if not file.filename.lower().endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files allowed")
-        
+
     file_location = STYLES_DIR / f"{current_user.id}_{file.filename}"
     try:
         with open(file_location, "wb+") as file_object:
             shutil.copyfileobj(file.file, file_object)
-            
+
         text = style_service.parse_pdf(file_location)
         return text
     except Exception as e:
