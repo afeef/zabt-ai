@@ -73,6 +73,9 @@ jobs:
       - name: Install backend deps
         working-directory: backend
         run: uv sync
+      - name: Apply migrations to test DB
+        working-directory: backend
+        run: uv run alembic upgrade head
       - name: Run unit tests
         working-directory: backend
         # Generate an ephemeral Fernet key at runtime (keeps secret-shaped strings out of the repo)
