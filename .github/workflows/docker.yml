@@ -1,0 +1,48 @@
+name: Docker build
+
+on:
+  pull_request:
+    paths:
+      - 'docker-compose*.yml'
+      - 'backend/**'
+      - 'frontend-2/**'
+      - 'packages/**'
+      - '.github/workflows/docker.yml'
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  compose-validate:
+    name: Validate compose files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create .env from example
+        run: cp .env.example .env
+      - name: Validate single-machine config
+        run: docker compose --env-file .env config --quiet
+      - name: Validate CPU override
+        run: docker compose --env-file .env -f docker-compose.yml -f docker-compose.cpu.yml config --quiet
+      - name: Validate cloud override
+        env:
+          COMPOSE_PROFILES: ''
+        run: docker compose --env-file .env -f docker-compose.yml -f docker-compose.cloud.yml config --quiet
+
+  build-api:
+    name: Build API image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build lightweight API image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          target: api
+          push: false
+          tags: zabt-api:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

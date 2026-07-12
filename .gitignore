@@ -193,3 +193,17 @@ frontend-2/tsconfig.tsbuildinfo
 # OSS-prep internal artifacts (not for public repo)
 docs/oss-prep/
 ROTATION-CHECKLIST.md
+
+# --- OSS / self-host runtime artifacts ---
+# ML model caches (Hugging Face, torch, whisper)
+.cache/huggingface/
+huggingface/
+model_cache/
+*.ckpt
+*.safetensors
+# User media, uploads, and transcripts (never commit real meeting data)
+uploads/
+transcripts/
+*.transcript.json
+# Kong TLS material
+kong/ssl/
