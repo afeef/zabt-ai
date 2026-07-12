@@ -57,6 +57,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+      - name: Prepare media dir
+        run: sudo mkdir -p /media/styles && sudo chmod -R 777 /media
       - name: Start MinIO + create bucket
         run: |
           docker run -d --name minio -p 9000:9000 \
