@@ -49,7 +49,6 @@ jobs:
       SUPABASE_JWT_SECRET: test-secret
       OPENAI_API_KEY: test-key
       OPENAI_BASE_URL: https://example.invalid/v1
-      TOKEN_ENCRYPTION_KEY: rvyplgNsJMQhanRt1aFB-IHOVu5l1-Y4lz-lmN5QsHM=
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -58,7 +57,11 @@ jobs:
         run: uv sync
       - name: Run unit tests
         working-directory: backend
-        run: uv run pytest tests/unit -q
+        # Generate an ephemeral Fernet key at runtime (keeps secret-shaped strings out of the repo)
+        run: |
+          TOKEN_ENCRYPTION_KEY="$(uv run python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')"
+          export TOKEN_ENCRYPTION_KEY
+          uv run pytest tests/unit -q
 
   frontend:
     name: Frontend type-check
