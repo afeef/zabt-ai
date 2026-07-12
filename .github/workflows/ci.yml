@@ -62,8 +62,9 @@ jobs:
           docker run -d --name minio -p 9000:9000 \
             -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin \
             minio/minio server /data
-          for i in $(seq 1 20); do
-            curl -sf http://localhost:9000/minio/health/live && break || sleep 2
+          for _ in $(seq 1 20); do
+            if curl -sf http://localhost:9000/minio/health/live; then break; fi
+            sleep 2
           done
           docker run --rm --network host minio/mc alias set m http://localhost:9000 minioadmin minioadmin
           docker run --rm --network host minio/mc mb --ignore-existing m/zabt-media
