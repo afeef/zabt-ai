@@ -26,14 +26,8 @@ jobs:
         run: uvx ruff format --check .
 
   backend-tests:
-    name: Backend unit tests (advisory)
+    name: Backend unit tests
     runs-on: ubuntu-latest
-    # Advisory until the test suite is cleaned up: it currently has PRE-EXISTING
-    # failures unrelated to this repo's open-sourcing — stale tests for a removed
-    # `whisper_provider` module and test-isolation issues (shared DB, no per-test
-    # rollback). Tracked as a post-launch follow-up. Lint, type-check, gitleaks, and
-    # the Docker build remain hard gates.
-    continue-on-error: true
     services:
       postgres:
         image: postgres:16-alpine
