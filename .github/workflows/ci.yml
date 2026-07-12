@@ -49,9 +49,24 @@ jobs:
       SUPABASE_JWT_SECRET: test-secret
       OPENAI_API_KEY: test-key
       OPENAI_BASE_URL: https://example.invalid/v1
+      STORAGE_PROVIDER: minio
+      MINIO_ENDPOINT: localhost:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET_NAME: zabt-media
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+      - name: Start MinIO + create bucket
+        run: |
+          docker run -d --name minio -p 9000:9000 \
+            -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin \
+            minio/minio server /data
+          for i in $(seq 1 20); do
+            curl -sf http://localhost:9000/minio/health/live && break || sleep 2
+          done
+          docker run --rm --network host minio/mc alias set m http://localhost:9000 minioadmin minioadmin
+          docker run --rm --network host minio/mc mb --ignore-existing m/zabt-media
       - name: Install backend deps
         working-directory: backend
         run: uv sync
