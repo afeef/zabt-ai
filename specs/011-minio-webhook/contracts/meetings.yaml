@@ -1,0 +1,120 @@
+# OpenAPI Contract: Meetings API (Refactored)
+# Feature: 011-minio-webhook
+#
+# Documents only the CHANGES to the existing meetings API.
+# Unchanged endpoints (GET /, GET /{id}, DELETE /{id}, POST /presigned-upload)
+# are not repeated here.
+
+openapi: "3.1.0"
+info:
+  title: Zabt Meetings API (Refactored)
+  version: "2.0.0"
+
+paths:
+  /api/v1/meetings/:
+    post:
+      summary: Create meeting record (no longer triggers processing)
+      description: |
+        Creates a Meeting record with status "pending_upload".
+        The Celery transcription task is NOT triggered here — it is triggered
+        by the MinIO webhook when the file lands in the bucket.
+
+        CHANGE from v1: Removed `process_meeting.delay()` call.
+        Frontend should call this BEFORE uploading the file to MinIO.
+      security:
+        - supabaseJWT: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MeetingCreateWithKey"
+            example:
+              title: "Weekly Standup"
+              description: "Sprint 12 standup recording"
+              file_key: "users/42/meetings/a1b2c3d4_recording.webm"
+      responses:
+        "200":
+          description: Meeting record created with status "pending_upload"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingRead"
+              example:
+                id: 42
+                owner_id: 1
+                title: "Weekly Standup"
+                description: "Sprint 12 standup recording"
+                file_path: "users/42/meetings/a1b2c3d4_recording.webm"
+                status: "pending_upload"
+                created_at: "2026-02-25T10:30:00Z"
+        "401":
+          description: Invalid or missing Supabase JWT
+
+  /api/v1/meetings/upload:
+    post:
+      summary: REMOVED — Direct multipart upload endpoint
+      description: |
+        This endpoint has been REMOVED. Use the presigned URL flow instead:
+        1. POST /meetings/presigned-upload → get upload_url + file_key
+        2. POST /meetings/ with file_key → create meeting record
+        3. PUT upload_url with file body → upload to MinIO
+        4. MinIO webhook triggers processing automatically
+      deprecated: true
+      responses:
+        "410":
+          description: Endpoint removed. Use presigned URL flow.
+
+components:
+  securitySchemes:
+    supabaseJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    MeetingCreateWithKey:
+      type: object
+      required: [title, file_key]
+      properties:
+        title:
+          type: string
+          example: "Weekly Standup"
+        description:
+          type: string
+          nullable: true
+        file_key:
+          type: string
+          description: "S3 object key from presigned-upload response"
+          example: "users/42/meetings/a1b2c3d4_recording.webm"
+
+    MeetingRead:
+      type: object
+      properties:
+        id:
+          type: integer
+        owner_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        file_path:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending_upload, queued, processing, completed, failed]
+        created_at:
+          type: string
+          format: date-time
+        transcript_text:
+          type: string
+          nullable: true
+        summary_text:
+          type: string
+          nullable: true
+        action_items_text:
+          type: string
+          nullable: true

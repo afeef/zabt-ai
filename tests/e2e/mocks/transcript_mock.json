@@ -1,0 +1,328 @@
+{
+    "id": 123,
+    "title": "Afeef with Irfan Lodhi",
+    "description": null,
+    "file_path": "mocked-path.mp4",
+    "duration_seconds": 2460,
+    "created_at": "2026-02-22T02:00:00Z",
+    "status": "completed",
+    "transcript_text": "...",
+    "summary_text": "...",
+    "action_items_text": null,
+    "speakers": {
+        "SPEAKER_00": {
+            "percentage": 61,
+            "name": "Speaker 1"
+        },
+        "SPEAKER_01": {
+            "percentage": 35,
+            "name": "Speaker 2"
+        },
+        "SPEAKER_UNKNOWN": {
+            "percentage": 4,
+            "name": "Unknown"
+        }
+    },
+    "segments": [
+        {
+            "start": 0.02,
+            "end": 9.0,
+            "speaker": "SPEAKER_00",
+            "text": "What are specific AI tools or projects you are working on now, and what is actually exciting you",
+            "words": [
+                {
+                    "word": "What",
+                    "start": 0.02,
+                    "end": 0.5
+                },
+                {
+                    "word": "are",
+                    "start": 0.6,
+                    "end": 1.0
+                },
+                {
+                    "word": "specific",
+                    "start": 1.1,
+                    "end": 2.0
+                },
+                {
+                    "word": "AI",
+                    "start": 2.1,
+                    "end": 2.5
+                },
+                {
+                    "word": "tools",
+                    "start": 2.6,
+                    "end": 3.0
+                },
+                {
+                    "word": "or",
+                    "start": 3.1,
+                    "end": 3.5
+                },
+                {
+                    "word": "projects",
+                    "start": 3.6,
+                    "end": 4.5
+                },
+                {
+                    "word": "you",
+                    "start": 4.6,
+                    "end": 5.0
+                },
+                {
+                    "word": "are",
+                    "start": 5.1,
+                    "end": 5.5
+                },
+                {
+                    "word": "working",
+                    "start": 5.6,
+                    "end": 6.5
+                },
+                {
+                    "word": "on",
+                    "start": 6.6,
+                    "end": 7.0
+                },
+                {
+                    "word": "now,",
+                    "start": 7.1,
+                    "end": 7.5
+                },
+                {
+                    "word": "and",
+                    "start": 7.6,
+                    "end": 8.0
+                },
+                {
+                    "word": "what",
+                    "start": 8.1,
+                    "end": 8.5
+                },
+                {
+                    "word": "is",
+                    "start": 8.6,
+                    "end": 8.7
+                },
+                {
+                    "word": "actually",
+                    "start": 8.8,
+                    "end": 8.9
+                },
+                {
+                    "word": "exciting",
+                    "start": 9.0,
+                    "end": 9.5
+                },
+                {
+                    "word": "you",
+                    "start": 9.6,
+                    "end": 9.9
+                }
+            ]
+        },
+        {
+            "start": 9.09,
+            "end": 19.0,
+            "speaker": "SPEAKER_01",
+            "text": "pass sankore developers, sankuru automation engineers, project managers, so aveemed, ai tools in house infrastructure.",
+            "words": [
+                {
+                    "word": "pass",
+                    "start": 9.1,
+                    "end": 10.0
+                },
+                {
+                    "word": "sankore",
+                    "start": 10.1,
+                    "end": 11.0
+                },
+                {
+                    "word": "developers,",
+                    "start": 11.1,
+                    "end": 12.0
+                },
+                {
+                    "word": "sankuru",
+                    "start": 12.1,
+                    "end": 13.0
+                },
+                {
+                    "word": "automation",
+                    "start": 13.1,
+                    "end": 14.0
+                },
+                {
+                    "word": "engineers,",
+                    "start": 14.1,
+                    "end": 15.0
+                },
+                {
+                    "word": "project",
+                    "start": 15.1,
+                    "end": 16.0
+                },
+                {
+                    "word": "managers,",
+                    "start": 16.1,
+                    "end": 17.0
+                },
+                {
+                    "word": "so",
+                    "start": 17.1,
+                    "end": 17.5
+                },
+                {
+                    "word": "aveemed,",
+                    "start": 17.6,
+                    "end": 18.0
+                },
+                {
+                    "word": "ai",
+                    "start": 18.1,
+                    "end": 18.2
+                },
+                {
+                    "word": "tools",
+                    "start": 18.3,
+                    "end": 18.5
+                },
+                {
+                    "word": "in",
+                    "start": 18.6,
+                    "end": 18.7
+                },
+                {
+                    "word": "house",
+                    "start": 18.8,
+                    "end": 18.9
+                },
+                {
+                    "word": "infrastructure.",
+                    "start": 19.0,
+                    "end": 19.5
+                }
+            ]
+        },
+        {
+            "start": 19.19,
+            "end": 23.0,
+            "speaker": "SPEAKER_00",
+            "text": "What do you foresee from maybe next three to five years.",
+            "words": [
+                {
+                    "word": "What",
+                    "start": 19.19,
+                    "end": 19.3
+                },
+                {
+                    "word": "do",
+                    "start": 19.4,
+                    "end": 19.5
+                },
+                {
+                    "word": "you",
+                    "start": 19.6,
+                    "end": 19.8
+                },
+                {
+                    "word": "foresee",
+                    "start": 19.9,
+                    "end": 20.5
+                },
+                {
+                    "word": "from",
+                    "start": 20.6,
+                    "end": 21.0
+                },
+                {
+                    "word": "maybe",
+                    "start": 21.1,
+                    "end": 21.5
+                },
+                {
+                    "word": "next",
+                    "start": 21.6,
+                    "end": 22.0
+                },
+                {
+                    "word": "three",
+                    "start": 22.1,
+                    "end": 22.3
+                },
+                {
+                    "word": "to",
+                    "start": 22.4,
+                    "end": 22.5
+                },
+                {
+                    "word": "five",
+                    "start": 22.6,
+                    "end": 22.8
+                },
+                {
+                    "word": "years.",
+                    "start": 22.9,
+                    "end": 23.0
+                }
+            ]
+        },
+        {
+            "start": 23.0,
+            "end": 27.0,
+            "speaker": "SPEAKER_UNKNOWN",
+            "text": "Also no so look nature, you",
+            "words": [
+                {
+                    "word": "Also",
+                    "start": 23.0,
+                    "end": 24.0
+                },
+                {
+                    "word": "no",
+                    "start": 24.1,
+                    "end": 25.0
+                },
+                {
+                    "word": "so",
+                    "start": 25.1,
+                    "end": 26.0
+                },
+                {
+                    "word": "look",
+                    "start": 26.1,
+                    "end": 26.5
+                },
+                {
+                    "word": "nature,",
+                    "start": 26.6,
+                    "end": 26.8
+                },
+                {
+                    "word": "you",
+                    "start": 26.9,
+                    "end": 27.0
+                }
+            ]
+        },
+        {
+            "start": 1801.0,
+            "end": 1810.0,
+            "speaker": "SPEAKER_01",
+            "text": "This text is past the 30 minute mark limit and should trigger the paywall.",
+            "words": [
+                {
+                    "word": "This",
+                    "start": 1801.0,
+                    "end": 1802.0
+                },
+                {
+                    "word": "text",
+                    "start": 1802.1,
+                    "end": 1803.0
+                }
+            ]
+        }
+    ]
+}

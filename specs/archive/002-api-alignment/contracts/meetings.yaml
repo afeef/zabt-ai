@@ -1,0 +1,231 @@
+openapi: "3.1.0"
+info:
+  title: Meetings API Contract
+  description: |
+    New endpoints added for the backend API alignment feature (002-api-alignment).
+    These endpoints replace the mocked meeting data in the old frontend.
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    MeetingRead:
+      type: object
+      required:
+        - id
+        - title
+        - file_path
+        - created_at
+        - status
+      properties:
+        id:
+          type: integer
+          description: Unique meeting identifier
+          example: 42
+        title:
+          type: string
+          description: Original filename as uploaded by the user
+          example: "weekly-standup-2026-02-19.mp3"
+        description:
+          type: string
+          nullable: true
+          description: Optional description; reserved for future use
+          example: null
+        file_path:
+          type: string
+          description: Server-side path to the stored file (not a downloadable URL)
+          example: "/media/uploads/a3f7e2b1_weekly-standup-2026-02-19.mp3"
+        duration_seconds:
+          type: integer
+          nullable: true
+          description: Duration of the audio/video; populated in a future phase
+          example: null
+        created_at:
+          type: string
+          format: date-time
+          description: UTC timestamp when the meeting was uploaded
+          example: "2026-02-19T14:30:00Z"
+        status:
+          type: string
+          enum: [queued, processing, completed, failed]
+          description: Current processing state of the meeting
+          example: "completed"
+        transcript_text:
+          type: string
+          nullable: true
+          description: Full transcript text from the audio transcription step; null until processing completes
+          example: "Good morning everyone, let's get started with the standup..."
+        summary_text:
+          type: string
+          nullable: true
+          description: AI-generated summary of the meeting; null until processing completes
+          example: "The team discussed sprint progress and identified two blockers..."
+        action_items_text:
+          type: string
+          nullable: true
+          description: Formatted list of action items extracted by AI; null until processing completes
+          example: "- Fix login bug (Alice)\n- Deploy to staging (Bob)"
+
+    MeetingList:
+      type: object
+      required:
+        - items
+        - total
+        - skip
+        - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MeetingRead"
+        total:
+          type: integer
+          description: Total number of meetings owned by the current user
+          example: 47
+        skip:
+          type: integer
+          description: Number of items skipped (offset)
+          example: 0
+        limit:
+          type: integer
+          description: Maximum number of items returned
+          example: 20
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          example: "Meeting not found"
+
+paths:
+  /meetings/:
+    get:
+      summary: List all meetings for the current user
+      description: |
+        Returns a paginated list of all meetings owned by the authenticated user,
+        ordered by creation date (newest first). Only meetings belonging to the
+        current user are returned — never another user's meetings.
+      operationId: list_meetings
+      parameters:
+        - name: skip
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Number of records to skip (for pagination)
+          example: 0
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Maximum number of records to return
+          example: 20
+      responses:
+        "200":
+          description: Paginated list of the user's meetings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingList"
+        "401":
+          description: Not authenticated — missing or invalid bearer token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /meetings/{id}:
+    get:
+      summary: Get a single meeting with full AI output
+      description: |
+        Returns full details for a meeting owned by the authenticated user,
+        including transcript, summary, and action items once processing is complete.
+        Returns 404 if the meeting does not exist or belongs to a different user.
+      operationId: get_meeting
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Meeting ID
+          example: 42
+      responses:
+        "200":
+          description: Meeting details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingRead"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Meeting not found or not owned by current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      summary: Delete a meeting and its associated file
+      description: |
+        Permanently removes the meeting record from the database and deletes the
+        associated audio/video file from storage. Only the owner of the meeting
+        can delete it. Returns 204 on success.
+      operationId: delete_meeting
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Meeting ID
+          example: 42
+      responses:
+        "204":
+          description: Meeting successfully deleted; no content returned
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Meeting not found or not owned by current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: |
+            Meeting cannot be deleted because it is currently being processed.
+            Wait for processing to complete or fail before deleting.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"

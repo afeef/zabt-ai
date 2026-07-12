@@ -1,0 +1,46 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  # FastAPI backend — public API traffic
+  - name: api-service
+    url: http://api:8000
+    routes:
+      - name: api-route
+        hosts:
+          - api.zabt.ai
+        paths:
+          - /
+        strip_path: false
+        preserve_host: true
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 30
+          policy: local
+          error_code: 429
+          error_message: "Rate limit exceeded. Please retry after the indicated delay."
+
+  # Bot Worker — Teams meeting bot
+  - name: worker-bot-service
+    url: http://worker-bot:8002
+    routes:
+      - name: worker-bot-route
+        hosts:
+          - bot.zabt.ai
+        paths:
+          - /
+        strip_path: false
+        preserve_host: true
+
+  # MinIO object storage — presigned upload/download URL proxy.
+  # Host-agnostic so presigned URLs signed against either old or new host
+  # remain valid. preserve_host: true keeps the S3 V4 HMAC signature intact.
+  - name: minio-service
+    url: http://minio:9000
+    routes:
+      - name: minio-storage-route
+        paths:
+          - /zabt-media
+        strip_path: false
+        preserve_host: true

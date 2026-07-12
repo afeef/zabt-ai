@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" fill="none">
+  <rect width="800" height="500" rx="16" fill="#f5f5f4"/>
+  <rect x="40" y="40" width="720" height="420" rx="12" fill="#e7e5e4" stroke="#d6d3d1" stroke-width="1"/>
+  <text x="400" y="260" text-anchor="middle" fill="#a8a29e" font-family="Inter, sans-serif" font-size="18">Product Screenshot</text>
+</svg>

@@ -1,0 +1,258 @@
+services:
+  # Redis for Task Queue
+  redis:
+    image: redis:7-alpine
+    restart: always
+    #ports:
+    #  - "6379:6379"
+
+  # Backend API (lightweight image — no ML deps)
+  api:
+    image: zabt-api:latest
+    restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: api
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --proxy-headers --forwarded-allow-ips='*'"
+    volumes:
+      - ./backend:/app
+      - media_data:/media
+    # Port intentionally not exposed to host — API is accessed via Kong gateway only.
+    # To access API directly for local dev, temporarily add: ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: redis://redis:6379/0
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-http://host.docker.internal:1234/v1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-lm-studio}
+      OPENAI_MODEL: ${OPENAI_MODEL:-llama-3-8b}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS:-http://localhost:3000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-}
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-}
+      MINIO_WEBHOOK_SECRET: ${MINIO_WEBHOOK_SECRET:-change-me-in-production}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-minio}
+      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-zabt-ai-bucket}
+      S3_PUBLIC_URL: ${S3_PUBLIC_URL:-}
+      S3_REGION: ${S3_REGION:-auto}
+      POSTHOG_API_KEY: ${POSTHOG_API_KEY:-}
+      POSTHOG_HOST: ${POSTHOG_HOST:-https://us.i.posthog.com}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-development}
+      LOGFIRE_TOKEN: ${LOGFIRE_TOKEN:-}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-https://cloud.langfuse.com}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-no-reply@zabt.ai}
+      APP_URL: ${APP_URL:-}
+      NOTIFICATION_PROVIDER: ${NOTIFICATION_PROVIDER:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID:-}
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET:-}
+      MICROSOFT_TENANT_ID: ${MICROSOFT_TENANT_ID:-common}
+      MICROSOFT_REDIRECT_URI: ${MICROSOFT_REDIRECT_URI:-}
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY:-}
+      BOT_WORKER_URL: ${BOT_WORKER_URL:-http://worker-bot:8002}
+    depends_on:
+      - redis
+
+  # Worker (lightweight — no GPU deps, same image for local and VPS)
+  worker:
+    image: zabt-worker:latest
+    restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: worker
+    command: celery -A app.worker.celery_app worker --loglevel=info
+    volumes:
+      - ./backend:/app
+      - media_data:/media
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: redis://redis:6379/0
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-http://host.docker.internal:1234/v1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-lm-studio}
+      OPENAI_MODEL: ${OPENAI_MODEL:-llama-3-8b}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-minio}
+      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-zabt-ai-bucket}
+      S3_PUBLIC_URL: ${S3_PUBLIC_URL:-}
+      S3_REGION: ${S3_REGION:-auto}
+      TRANSCRIPTION_BACKEND: ${TRANSCRIPTION_BACKEND:-runpod}
+      RUNPOD_API_KEY: ${RUNPOD_API_KEY:-}
+      RUNPOD_ENDPOINT_ID: ${RUNPOD_ENDPOINT_ID:-}
+      RUNPOD_POLL_INTERVAL: ${RUNPOD_POLL_INTERVAL:-5}
+      RUNPOD_TIMEOUT: ${RUNPOD_TIMEOUT:-1800}
+      GPU_SERVICE_URL: ${GPU_SERVICE_URL:-}
+      POSTHOG_API_KEY: ${POSTHOG_API_KEY:-}
+      POSTHOG_HOST: ${POSTHOG_HOST:-https://us.i.posthog.com}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-development}
+      LOGFIRE_TOKEN: ${LOGFIRE_TOKEN:-}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-https://cloud.langfuse.com}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-no-reply@zabt.ai}
+      APP_URL: ${APP_URL:-}
+      NOTIFICATION_PROVIDER: ${NOTIFICATION_PROVIDER:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID:-}
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET:-}
+      MICROSOFT_TENANT_ID: ${MICROSOFT_TENANT_ID:-common}
+      MICROSOFT_REDIRECT_URI: ${MICROSOFT_REDIRECT_URI:-}
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY:-}
+      BOT_WORKER_URL: ${BOT_WORKER_URL:-http://worker-bot:8002}
+    depends_on:
+      - redis
+
+  # Celery Beat — schedules periodic tasks (calendar sync, recording check, bot dispatch)
+  beat:
+    image: zabt-worker:latest
+    restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: worker
+    command: celery -A app.worker.celery_app beat --loglevel=info
+    volumes:
+      - ./backend:/app
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: redis://redis:6379/0
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID:-}
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET:-}
+      MICROSOFT_TENANT_ID: ${MICROSOFT_TENANT_ID:-common}
+      MICROSOFT_REDIRECT_URI: ${MICROSOFT_REDIRECT_URI:-}
+      TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY:-}
+      BOT_WORKER_URL: ${BOT_WORKER_URL:-http://worker-bot:8002}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-minio}
+      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-zabt-ai-bucket}
+      S3_REGION: ${S3_REGION:-auto}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      LOGFIRE_TOKEN: ${LOGFIRE_TOKEN:-}
+      APP_URL: ${APP_URL:-}
+    depends_on:
+      - redis
+
+  # Bot Worker — joins Teams meetings via headless browser and records audio
+  worker-bot:
+    image: zabt-bot-worker:latest
+    restart: unless-stopped
+    shm_size: "2gb"
+    build:
+      context: ./zabt-bot-worker
+    environment:
+      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-zabt-ai-bucket}
+      S3_REGION: ${S3_REGION:-auto}
+      WORKER_ID: bot-worker-1
+      BOT_DISPLAY_NAME: ${BOT_DISPLAY_NAME:-Zabt AI Notetaker}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-development}
+      LOGFIRE_TOKEN: ${LOGFIRE_TOKEN:-}
+      POSTHOG_API_KEY: ${POSTHOG_API_KEY:-}
+      POSTHOG_HOST: ${POSTHOG_HOST:-https://us.i.posthog.com}
+      PORT: 8002
+    depends_on:
+      - redis
+
+  # GPU Worker — standalone transcription service (local dev with GPU)
+  worker-gpu:
+    image: afeef/zabt-gpu-worker:latest
+    restart: unless-stopped
+    profiles: [ "local" ]
+    build:
+      context: ./zabt-gpu-worker
+    ports:
+      - "8001:8001"
+    environment:
+      - MODE=local
+      - WHISPER_MODEL=${WHISPER_MODEL:-large-v3}
+      - DIARIZATION_MODEL=${DIARIZATION_MODEL:-pyannote/speaker-diarization-3.1}
+      - MEDASR_MODEL=${MEDASR_MODEL:-google/medasr}
+      - HF_TOKEN=${HF_TOKEN:-}
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - LOGFIRE_TOKEN=${LOGFIRE_TOKEN:-}
+      - DIARIZATION_MIN_SPEAKERS=${DIARIZATION_MIN_SPEAKERS:-1}
+      - DIARIZATION_MAX_SPEAKERS=${DIARIZATION_MAX_SPEAKERS:-10}
+      - SENTRY_ENVIRONMENT=local
+      - PORT=8001
+    volumes:
+      - worker_model_cache:/root/.cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+
+  # Frontend (Next.js) — local dev only, Vercel hosts in production
+  # Visual breakdown worker — local mode only. Plan 1 / 2 / 3 split:
+  # this CPU-only image runs the FastAPI server, while Plan 4 will produce
+  # a separate GPU image for RunPod with transformers + Qwen3-VL.
+  zabt-vision-worker:
+    image: zabt-vision-worker:latest
+    restart: unless-stopped
+    build:
+      context: ./zabt-vision-worker
+      dockerfile: Dockerfile
+    environment:
+      - VISION_JUDGE_MODEL=${VISION_JUDGE_MODEL:-qwen3-vl:8b-thinking}
+      - OLLAMA_HOST=${OLLAMA_HOST:-http://host.docker.internal:11434}
+      - S3_ENDPOINT_URL=${S3_ENDPOINT_URL:-}
+      - S3_REGION=${S3_REGION:-auto}
+      - AWS_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY:-}
+      - S3_BUCKET=${S3_BUCKET_NAME:-zabt-ai-bucket}
+      - OCR_USE_GPU=false
+    ports:
+      - "8003:8003"
+    extra_hosts:
+      # Lets the container reach an Ollama server running on the Docker host
+      - "host.docker.internal:host-gateway"
+
+  web:
+    profiles: [ "local" ]
+    restart: unless-stopped
+    build:
+      context: ./frontend-2
+      dockerfile: Dockerfile
+    command: npm run dev
+    volumes:
+      - ./frontend-2:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost/api/v1}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY:-}
+      - NEXT_PUBLIC_POSTHOG_HOST=${NEXT_PUBLIC_POSTHOG_HOST:-https://us.i.posthog.com}
+    depends_on:
+      - api
+
+volumes:
+  media_data:
+  worker_model_cache:

@@ -1,0 +1,63 @@
+[project]
+name = "zabt-vision-worker"
+version = "0.1.0"
+description = "Stateless vision worker for Zabt visual breakdown feature"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.6",
+    "typer>=0.15",
+    "rich>=13.9",
+    "ollama>=0.4",
+    "openai>=1.55",
+    "boto3>=1.35",
+    "imagehash>=4.3",
+    "Pillow>=11.0",
+    "httpx>=0.28",
+    "ffmpeg-python>=0.2",
+]
+
+[project.optional-dependencies]
+# Scene-detection extra: lightweight (~100MB), required for the
+# PySceneDetect signal in the pipeline.
+scene = [
+    "scenedetect>=0.6.5",
+    "opencv-python-headless>=4.10",
+]
+# OCR extra: heavy (~3GB, pulls torch + cuda). Required only when
+# actually running the pipeline against real videos. Unit tests mock
+# the easyocr reader and do NOT need this installed.
+ocr = [
+    "easyocr>=1.7",
+]
+# Convenience meta-extra installing both scene and ocr.
+ml = [
+    "scenedetect>=0.6.5",
+    "opencv-python-headless>=4.10",
+    "easyocr>=1.7",
+]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-mock>=3.14",
+    "ruff>=0.8",
+]
+
+[project.scripts]
+zabt-vision = "zabt_vision.cli:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "integration: end-to-end tests that require a real video file and Ollama running",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF"]

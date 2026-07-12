@@ -1,0 +1,13 @@
+# gitleaks configuration for zabt.ai
+# Extends the default ruleset and allowlists known false positives.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known false positives (not secrets)"
+regexes = [
+  # boto3/S3 presigned-URL expiry kwarg — flagged as generic-api-key
+  '''expiration=3600''',
+  # jwt.io canonical demo token used in unit-test fixtures
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJzdWIiOiIxMjM0NTY3ODkwIn0''',
+]

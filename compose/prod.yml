@@ -1,0 +1,48 @@
+# Production overlay. Adds Kong, mounts SSL certs, applies prod URL overrides.
+# Used on the VPS only.
+services:
+  # Kong API Gateway — single public entry point for all external traffic
+  kong:
+    image: kong:3.6
+    container_name: kong
+    restart: unless-stopped
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
+      KONG_PROXY_LISTEN: "0.0.0.0:8000, 0.0.0.0:8443 ssl"
+      KONG_ADMIN_LISTEN: "127.0.0.1:8001"
+      KONG_LOG_LEVEL: notice
+      KONG_SSL_CERT: /etc/kong/ssl/origin.pem
+      KONG_SSL_CERT_KEY: /etc/kong/ssl/origin.key
+    volumes:
+      - ./kong/kong.yml:/etc/kong/kong.yml:ro
+      - ./kong/ssl:/etc/kong/ssl:ro
+    ports:
+      - "80:8000"
+      - "443:8443"
+    depends_on:
+      - api
+
+  # Prod URL overrides for the API
+  api:
+    environment:
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-https://api.zabt.ai}
+      APP_URL: ${APP_URL:-https://app.zabt.ai}
+      MICROSOFT_REDIRECT_URI: ${MICROSOFT_REDIRECT_URI:-https://api.zabt.ai/api/v1/integrations/microsoft/callback}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
+
+  # Prod URL overrides for the worker (uses APP_URL for email links)
+  worker:
+    environment:
+      APP_URL: ${APP_URL:-https://app.zabt.ai}
+      MICROSOFT_REDIRECT_URI: ${MICROSOFT_REDIRECT_URI:-https://api.zabt.ai/api/v1/integrations/microsoft/callback}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
+
+  beat:
+    environment:
+      APP_URL: ${APP_URL:-https://app.zabt.ai}
+      MICROSOFT_REDIRECT_URI: ${MICROSOFT_REDIRECT_URI:-https://api.zabt.ai/api/v1/integrations/microsoft/callback}
+
+  worker-bot:
+    environment:
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}

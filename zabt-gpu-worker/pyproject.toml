@@ -1,0 +1,30 @@
+[project]
+name = "zabt-gpu-worker"
+version = "0.1.0"
+description = "Standalone GPU transcription service (WhisperX + pyannote)"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "whisperx>=3.8.4",
+    "pyannote-audio>=4.0.4",
+    "transformers>=5.0.0",
+    "librosa>=0.10.0",
+    "runpod>=1.8.1",
+    "fastapi>=0.135.2",
+    "uvicorn>=0.42.0",
+    "httpx>=0.28.1",
+    "sentry-sdk>=2.57.0",
+    "logfire[fastapi,httpx]>=4.25.0",
+    "pydantic-settings>=2.13.1",
+]
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+override-dependencies = ["huggingface-hub>=1.5.0,<2.0"]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }

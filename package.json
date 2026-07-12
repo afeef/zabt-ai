@@ -1,0 +1,26 @@
+{
+  "name": "zabt-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "frontend-2",
+    "packages/*"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace=@zabt/shared",
+    "dev:shared": "npm run dev --workspace=@zabt/shared",
+    "dev:web": "npm run dev --workspace=frontend-2",
+    "build:web": "npm run build --workspace=frontend-2"
+  },
+  "overrides": {
+    "hono": "4.12.26",
+    "markdown-it": "14.2.0",
+    "dompurify": "3.4.11",
+    "qs": "6.15.2",
+    "protobufjs": "7.6.4",
+    "@protobufjs/utf8": "1.1.1",
+    "brace-expansion": "5.0.6",
+    "fast-uri": "3.1.2",
+    "linkify-it": "5.0.1"
+  }
+}

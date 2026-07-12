@@ -1,0 +1,29 @@
+# Virtual environments
+.venv
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+
+# Local dev / editor
+.env
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
+
+# Test artifacts
+tests/
+
+# Documentation (keep README.md — hatchling needs it for package build)
+*.md
+!README.md
+LICENSE
+
+# Output / media artifacts
+output/

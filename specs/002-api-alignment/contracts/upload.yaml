@@ -1,0 +1,157 @@
+openapi: "3.1.0"
+info:
+  title: Upload API Contract (Updated)
+  description: |
+    Updated contract for the POST /upload endpoint.
+    Changes from current implementation:
+    1. Authentication is now REQUIRED (was disabled/mocked)
+    2. File is stored with a UUID prefix to prevent name collisions
+    3. Background processing task is triggered automatically after upload
+  version: "2.0.0"
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    MeetingRead:
+      type: object
+      required:
+        - id
+        - title
+        - file_path
+        - created_at
+        - status
+      properties:
+        id:
+          type: integer
+          example: 42
+        title:
+          type: string
+          description: Original filename as provided by the user
+          example: "board-meeting-q1.mp3"
+        description:
+          type: string
+          nullable: true
+          example: null
+        file_path:
+          type: string
+          description: Server-side filesystem path including UUID prefix
+          example: "/media/uploads/c9d1e4f2_board-meeting-q1.mp3"
+        duration_seconds:
+          type: integer
+          nullable: true
+          example: null
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-02-19T15:00:00Z"
+        status:
+          type: string
+          enum: [queued, processing, completed, failed]
+          description: Always "queued" immediately after upload; transitions via background task
+          example: "queued"
+        transcript_text:
+          type: string
+          nullable: true
+          example: null
+        summary_text:
+          type: string
+          nullable: true
+          example: null
+        action_items_text:
+          type: string
+          nullable: true
+          example: null
+
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+
+paths:
+  /upload:
+    post:
+      summary: Upload an audio or video file for transcription and summarization
+      description: |
+        Accepts an audio or video file, saves it to storage, creates a meeting record
+        under the authenticated user's account, and automatically queues the file for
+        AI transcription and summarization.
+
+        **Changes from previous version**:
+        - Requires authentication (Bearer token) — previously any request was accepted
+        - Meeting is associated with the authenticated user, not a hardcoded owner
+        - Background AI processing task is triggered automatically
+        - File is stored as `{uuid}_{original_filename}` to prevent collisions
+
+        **Processing flow** (after upload returns):
+        queued → processing → completed (or failed)
+
+        The client should poll `GET /meetings/{id}` every 3–5 seconds to check status.
+      operationId: upload_meeting
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Audio or video file (MP3, WAV, M4A, MP4, etc.), max 500 MB
+      responses:
+        "200":
+          description: |
+            File accepted. Meeting record created with status "queued".
+            Processing has started in the background.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingRead"
+              example:
+                id: 42
+                title: "board-meeting-q1.mp3"
+                description: null
+                file_path: "/media/uploads/c9d1e4f2_board-meeting-q1.mp3"
+                duration_seconds: null
+                created_at: "2026-02-19T15:00:00Z"
+                status: "queued"
+                transcript_text: null
+                summary_text: null
+                action_items_text: null
+        "401":
+          description: Not authenticated — missing or invalid Bearer token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                detail: "Not authenticated"
+        "422":
+          description: Validation error — file field missing or wrong type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error during file save or database write
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"

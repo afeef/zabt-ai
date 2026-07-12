@@ -1,0 +1,77 @@
+openapi: 3.0.0
+info:
+  title: Meeting API
+  version: 1.0.0
+paths:
+  /meetings/:
+    post:
+      summary: Initialize a new meeting session
+      security:
+        - openIdConnect: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                style_profile_id:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Meeting created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meeting'
+  /meetings/upload:
+    post:
+      summary: Upload an audio file for processing
+      security:
+        - openIdConnect: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                style_profile_id:
+                   type: string
+                   format: uuid
+      responses:
+        '202':
+          description: Processing queued
+  /meetings/{meeting_id}/transcript:
+    get:
+      summary: Get full transcript
+      security:
+        - openIdConnect: []
+      responses:
+        '200':
+          description: List of segments
+    websocket:
+      summary: Real-time audio stream
+      description: Client streams audio binary; Server returns transcript text events. Authenticated via Ticket/Token.
+
+components:
+  schemas:
+    Meeting:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        status:
+          type: string
+          enum: [recording, processing, completed]
+  securitySchemes:
+    openIdConnect:
+      type: openIdConnect
+      openIdConnectUrl: https://{logto_domain}/oidc/.well-known/openid-configuration

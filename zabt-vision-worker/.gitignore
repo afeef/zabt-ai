@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.DS_Store
+frames/
+keyframes/
+output/
+*.mp4
+*.mov
+*.webm
+*.json.local
+
+# Allow the small synthetic test fixture (committed to the repo)
+!tests/fixtures/sample.mp4

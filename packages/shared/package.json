@@ -1,0 +1,18 @@
+{
+  "name": "@zabt/shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "tsc --build --watch",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "axios": "^1.15.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}
