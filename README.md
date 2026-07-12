@@ -1,204 +1,154 @@
-# Zabt — AI Note Taker
+# zabt.ai
 
-Zabt is an AI-powered meeting note taker. It transcribes and summarizes your meetings automatically using a local AI backend secured by Supabase authentication.
+**Self-hosted AI meeting intelligence.** zabt.ai transcribes, diarizes, and summarizes
+your meetings on infrastructure *you* control — a self-hosted alternative to Otter.ai and
+Fireflies where your audio and transcripts never leave your machines. Upload a recording (or
+let the bot join a call), and get an accurate, speaker-labeled transcript and an LLM-written
+summary, powered by faster-whisper, pyannote, and any OpenAI-compatible model.
 
-## Stack
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](./LICENSE)
 
-- **Frontend**: Next.js 16, React 19, Tailwind CSS 4 (deployed on Vercel)
-- **Backend**: Python 3.11, FastAPI, Celery, SQLModel
-- **Auth**: Supabase Cloud (JWT)
-- **AI**: OpenAI-compatible API (local LM Studio or remote)
-- **Database**: PostgreSQL 16
-- **Queue**: Redis 7
-- **Storage**: MinIO (local dev) or AWS S3 (production)
-- **Gateway**: Kong 3.6 (API gateway + rate limiting)
-- **Vector DB**: Qdrant (for future RAG/AI Chat)
+<!-- TODO(human): record 60s demo -->
+
+## Why zabt.ai
+
+- **Your data stays yours.** Audio, transcripts, and summaries live on your own hardware or
+  cloud account — nothing is sent to a third-party meeting-notes SaaS.
+- **Runs on one machine.** `git clone` → `docker compose up`. Bundled Postgres, object
+  storage, transcription worker, and web UI.
+- **Bring your own models.** Any OpenAI-compatible LLM endpoint (OpenRouter, Ollama, vLLM,
+  LM Studio, OpenAI). Whisper model size is your call.
+- **Accurate, speaker-labeled transcripts.** faster-whisper for ASR + pyannote for
+  diarization ("who said what").
+- **Scales when you need it.** The same codebase runs a single-box deploy or a split
+  topology with RunPod serverless GPUs behind a small API VPS.
 
 ## Architecture
 
+```mermaid
+flowchart LR
+    U[User / Meeting bot] -->|upload audio| API[FastAPI API]
+    API -->|enqueue| Q[(Redis / Celery)]
+    Q --> W[Celery worker]
+    W -->|audio| GPU[GPU worker]
+    subgraph Transcription pipeline
+      GPU --> ASR[faster-whisper<br/>speech-to-text]
+      ASR --> DIA[pyannote<br/>diarization]
+    end
+    DIA -->|speaker-labeled transcript| W
+    W -->|prompt + transcript| LLM[OpenAI-compatible LLM<br/>summary]
+    LLM --> DB[(Postgres)]
+    API --> DB
+    API --> S[(Object storage<br/>MinIO / S3)]
+    WEB[Next.js web UI] --> API
 ```
-Internet → Cloudflare (DNS proxy + SSL) → Kong (:80/:443) → FastAPI API (:8000)
-                                                           → MinIO (:9000)
-Frontend (Vercel) → Kong → FastAPI
-```
 
-### Services
+The GPU worker runs locally by default; in the cloud topology it is a RunPod serverless
+endpoint. Authentication is delegated to Supabase (a free project works).
 
-| Service | Image | Purpose |
-|---------|-------|---------|
-| `db` | `postgres:16-alpine` | Primary database |
-| `redis` | `redis:7-alpine` | Celery task broker |
-| `minio` | `minio/minio` | Object storage — local only (`compose/storage.local.yml`) |
-| `kong` | `kong:3.6` | API gateway, SSL termination, rate limiting (prod only — `compose/prod.yml`) |
-| `api` | `zabt-api:latest` | FastAPI backend |
-| `worker` | `zabt-worker:latest` | Celery worker |
-| `worker-gpu` | `afeef/zabt-gpu-worker` | GPU transcription worker — local only (`compose/gpu.local.yml`) |
-| `web` | `zabt-web` | Next.js frontend — local only (`compose/local.yml`) |
+## Quick start (single machine)
 
-## Quick Start (Local Development)
-
-The Compose stack is split into a base file plus opt-in overlays in
-`compose/`. See [`compose/README.md`](compose/README.md) for the full guide.
-
-Quick start (full standalone — local Postgres, MinIO, GPU worker):
+**Prerequisites:** Docker + Docker Compose. For GPU transcription: an NVIDIA GPU with the
+[NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
+No GPU? See [CPU-only](#cpu-only) below.
 
 ```bash
-cp compose/local.env.example .env
-# Fill in Supabase credentials at minimum. Other secrets can stay empty.
-docker compose up
-```
-
-Frontend at `http://localhost:3000`, API at `http://localhost:8000`,
-MinIO console at `http://localhost:9001`.
-
-To dev against cloud services (no GPU box, testing only api/worker), edit
-`COMPOSE_FILE` in `.env`:
-
-```
-COMPOSE_FILE=docker-compose.yml:compose/local.yml
-```
-
-## Storage Providers
-
-Zabt supports two storage backends, controlled by the `STORAGE_PROVIDER` environment variable.
-
-### MinIO (Local Development — default)
-
-Set `STORAGE_PROVIDER=minio` (or leave unset). MinIO runs as a Docker service and triggers the transcription pipeline via webhook.
-
-```bash
-# Start with MinIO + GPU worker + web (local dev)
-# .env should have COMPOSE_FILE including compose/storage.local.yml + compose/gpu.local.yml
+git clone https://github.com/<your-org>/zabt-ai.git
+cd zabt-ai
+cp .env.example .env
+#   Edit .env and set the 4 REQUIRED values:
+#     SUPABASE_URL / SUPABASE_JWT_SECRET / NEXT_PUBLIC_SUPABASE_* (one free Supabase project)
+#     OPENAI_API_KEY   (any OpenAI-compatible LLM key)
+#     HF_TOKEN         (Hugging Face token — accept the pyannote gate, see below)
 docker compose up -d
 ```
 
-### AWS S3 (Production VPS)
+Then open:
+- Web UI → http://localhost:3000
+- API → http://localhost:8000
+- MinIO console → http://localhost:9001
 
-Set `STORAGE_PROVIDER=s3` and configure the `S3_*` variables in `.env`:
+First run downloads the Whisper + pyannote model weights (several GB) into a cached volume.
 
-```env
-STORAGE_PROVIDER=s3
-S3_ENDPOINT_URL=https://s3.amazonaws.com
-S3_ACCESS_KEY_ID=<your-aws-access-key>
-S3_SECRET_ACCESS_KEY=<your-aws-secret-key>
-S3_BUCKET_NAME=zabt-media
-S3_PUBLIC_URL=https://s3.amazonaws.com
-S3_REGION=us-east-1
-```
+### CPU-only
 
-When using S3, MinIO is not required. The frontend calls `POST /api/v1/meetings/{id}/confirm-upload` after uploading to trigger the transcription pipeline (replacing the MinIO webhook).
+No NVIDIA GPU? Run transcription on CPU (slow — use a smaller `WHISPER_MODEL` like `base`):
 
 ```bash
-# Start without MinIO/web (VPS with S3 + RunPod transcription)
-# .env should have COMPOSE_FILE=docker-compose.yml:compose/prod.yml (see compose/prod.env.example)
-docker compose up -d
+docker compose -f docker-compose.yml -f docker-compose.cpu.yml up -d
 ```
 
-## Transcription Providers
+### pyannote Hugging Face gate (required)
 
-Zabt supports two transcription backends, controlled by the `TRANSCRIPTION_PROVIDER` environment variable.
+Diarization uses gated pyannote models. **The model weights are not shipped with this repo —
+you accept the terms and download them yourself:**
 
-### Local (Development — default)
+1. Create a free account at https://huggingface.co
+2. Accept the model conditions on **both**:
+   - https://huggingface.co/pyannote/speaker-diarization-3.1
+   - https://huggingface.co/pyannote/segmentation-3.0
+3. Create a token at https://huggingface.co/settings/tokens and set it as `HF_TOKEN` in `.env`.
 
-Set `TRANSCRIPTION_PROVIDER=local` (or leave unset). The worker runs Whisper + pyannote locally using the GPU.
+## Features
 
-### RunPod Serverless (Production VPS)
+- Audio/video upload → transcription → diarization → LLM summary
+- Speaker-labeled, timestamped transcripts with an in-app viewer and editor
+- Customizable summary templates
+- YouTube URL ingestion
+- Microsoft Teams meeting bot (joins and records) *(optional)*
+- Visual breakdown of screen-share/video content *(optional, needs Ollama)*
+- Server-side PDF export of transcripts and summaries
+- Email + Telegram notifications *(optional)*
+- Medical transcription mode (MedASR)
 
-Set `TRANSCRIPTION_PROVIDER=runpod` for VPS deployments without a GPU. The worker delegates transcription to a RunPod Serverless endpoint running Whisper large-v3 + pyannote.
+## Hardware requirements
 
-```env
-TRANSCRIPTION_PROVIDER=runpod
-RUNPOD_API_KEY=rp_xxxxxxxxxxxxxxxx
-RUNPOD_ENDPOINT_ID=<your-endpoint-id>
-```
+Transcription is the demanding part. Approximate GPU VRAM by Whisper model (`WHISPER_MODEL`),
+plus ~2-4 GB for pyannote diarization:
 
-See [`runpod/README.md`](runpod/README.md) for handler deployment instructions.
+| `WHISPER_MODEL` | VRAM (GPU, float16) | Notes |
+|-----------------|---------------------|-------|
+| `tiny` / `base` | ~1-2 GB | Fast, lower accuracy — good for CPU |
+| `small` | ~2-3 GB | |
+| `medium` | ~5 GB | |
+| `large-v3` (default) | ~10-12 GB | Best accuracy |
 
-## VPS Deployment (Contabo)
+- **CPU-only:** works with `int8` compute (automatic) but is roughly 1-5× real-time; prefer
+  `base`/`small`.
+- **API + workers + DB + Redis + MinIO:** comfortable in ~4 GB RAM / 2 vCPU (excluding the
+  GPU worker's model memory).
+- **Disk:** budget ~10-15 GB for model weights + your media.
 
-The production backend runs on a Contabo VPS (6 vCPU, 12GB RAM) with Cloudflare DNS (proxied) for SSL and DDoS protection.
+## Deployment topologies
 
-### Initial Setup
+| Topology | Command | Use |
+|----------|---------|-----|
+| Single machine (default) | `docker compose up -d` | Self-host everything on one box with a local GPU |
+| CPU-only | `docker compose -f docker-compose.yml -f docker-compose.cpu.yml up -d` | No GPU available |
+| Cloud / RunPod split | `docker compose -f docker-compose.yml -f docker-compose.cloud.yml up -d` | Small API VPS + serverless GPU; managed DB/storage |
 
-```bash
-# 1. Install Docker
-curl -fsSL https://get.docker.com | sh
+See [docs/self-hosting.md](docs/self-hosting.md) and
+[docs/advanced-runpod-split.md](docs/advanced-runpod-split.md). Full variable reference:
+[docs/configuration.md](docs/configuration.md). Common questions (including AGPL): [docs/faq.md](docs/faq.md).
 
-# 2. Configure firewall
-ufw default deny incoming
-ufw default allow outgoing
-ufw allow ssh
-ufw allow 80/tcp
-ufw allow 443/tcp
-ufw enable
+## Tech stack
 
-# 3. Clone and configure
-git clone <repo-url> /opt/zabt
-cd /opt/zabt
-# Create .env with production values
+Python 3.11 · FastAPI · Celery · SQLModel · faster-whisper (WhisperX) · pyannote-audio ·
+Next.js 16 / React 19 · Tailwind CSS 4 · Postgres 16 · Redis 7 · MinIO/S3 · Supabase (auth).
 
-# 4. Place Cloudflare Origin Certificate for SSL
-mkdir -p kong/ssl
-# Copy origin.pem and origin.key to kong/ssl/
+## License & contributing
 
-# 5. Set up .env (first time): COMPOSE_FILE=docker-compose.yml:compose/prod.yml + secrets
-cp compose/prod.env.example .env  # then fill secrets
-docker build -f backend/Dockerfile.worker-base -t zabt-worker-base:latest ./backend
-docker compose up -d --build
+zabt.ai is licensed under the **GNU AGPL-3.0** (see [LICENSE](./LICENSE) and [NOTICE](./NOTICE)).
+In short: you may self-host, modify, and redistribute freely; if you offer a modified version
+over a network, you must make your source available to its users.
 
-# 6. Migrate database (from local machine)
-# Local: docker compose exec db pg_dump -U app -d zabt > zabt_dump.sql
-# Local: scp zabt_dump.sql root@<VPS_IP>:/opt/zabt/
-# VPS:   docker compose exec -T db psql -U <user> -d <db> < zabt_dump.sql
-```
+- **Contributing:** see [CONTRIBUTING.md](./CONTRIBUTING.md). A quick
+  [CLA](./CLA.md) signature (handled automatically on your first PR) is required.
+- **Using it inside your company is free** and does not trigger any source-sharing obligation —
+  see the [FAQ](docs/faq.md).
+- **Commercial licensing** (to embed zabt.ai in a proprietary product without AGPL
+  obligations): licensing@zabt.ai.
+- **Security issues:** please follow [SECURITY.md](./SECURITY.md) — do not open public issues.
 
-### Cloudflare DNS
-
-- **A record**: `zabt-api` → VPS public IP (Proxied)
-- **SSL/TLS mode**: Flexible (or Full with origin cert)
-
-### Updating
-
-```bash
-cd /opt/zabt
-git pull
-docker compose up -d --build
-```
-
-`.env` already contains `COMPOSE_FILE=docker-compose.yml:compose/prod.yml`
-from initial setup, so no `--profile` flags or `-f` arguments are needed.
-
-## Docker Images
-
-| File | Tag | Size | Purpose |
-|------|-----|------|---------|
-| `Dockerfile` (target `api`) | `zabt-api:latest` | ~850 MB | Lightweight FastAPI server (no ML) |
-| `Dockerfile.worker-base` | `zabt-worker-base:latest` | ~10 GB | ML base layer — CUDA + PyTorch + Whisper + pyannote |
-| `Dockerfile` (target `worker`) | `zabt-worker:latest` | ~10 GB | Celery worker — builds on `worker-base` in seconds |
-
-### Build workflow
-
-The ML base image is large and slow to build (~15-20 min). Build it once and cache it locally. Only rebuild when ML dependencies change (`[dependency-groups] ml` in `pyproject.toml`).
-
-```bash
-# One-time (or when ML deps change): ~15-20 minutes
-docker build -f backend/Dockerfile.worker-base -t zabt-worker-base:latest ./backend
-
-# Every other time (code changes, new packages like resend/logfire): ~30 seconds
-docker build --target worker -t zabt-worker:latest ./backend
-docker build --target api -t zabt-api:latest ./backend
-```
-
-### When to rebuild `worker-base`
-
-Only when `pyproject.toml` changes under `[dependency-groups] ml`:
-
-```toml
-ml = [
-    "openai-whisper>=...",
-    "whisperx>=...",
-    "pyannote-audio>=...",
-]
-```
-
-All other dependency changes (core deps, new features) only require rebuilding `worker`.
+"zabt" and "zabt.ai" are trademarks of Afeef Janjua; the AGPL does not grant trademark rights
+(see [NOTICE](./NOTICE)).
