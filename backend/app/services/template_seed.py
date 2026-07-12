@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 from sqlmodel import Session, select
 from app.db.engine import engine
 from app.models import Meeting, SummaryTemplate

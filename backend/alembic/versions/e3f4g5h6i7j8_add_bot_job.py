@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """add bot_job table
 
 Revision ID: e3f4g5h6i7j8

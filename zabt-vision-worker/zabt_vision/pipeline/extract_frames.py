@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path

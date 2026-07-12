@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type { Meeting, MeetingList, User } from "@zabt/shared";
 import { api } from "./api";

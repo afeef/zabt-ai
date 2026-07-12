@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Regression tests for ZABT-API-1Z / ZABT-API-1V.
 
 - ZABT-API-1V: future-events re-query per integration (redundant).

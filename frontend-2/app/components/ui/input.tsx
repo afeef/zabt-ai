@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import * as React from "react"
 import { Input as InputPrimitive } from "@base-ui/react/input"
 

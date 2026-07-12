@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Quick local test — launches browser and tries to join a Teams meeting.
 No Docker, no S3, no backend. Just Playwright + the join flow.
 

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 from zabt_vision.inference.base import VisionInference
 from zabt_vision.inference.ollama_backend import OllamaInference
 from zabt_vision.settings import Settings

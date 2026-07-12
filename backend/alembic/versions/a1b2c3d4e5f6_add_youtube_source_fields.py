@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """add youtube source fields
 
 Revision ID: a1b2c3d4e5f6

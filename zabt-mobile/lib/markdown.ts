@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 /**
  * Strip common markdown syntax for short list previews. Not exhaustive — just
  * removes the noise so a card snippet reads naturally without rendering.

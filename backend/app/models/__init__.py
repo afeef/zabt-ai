@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 # Re-export everything from base models (preserves all existing imports)
 from app.models.base import (
     TranscriptionType,

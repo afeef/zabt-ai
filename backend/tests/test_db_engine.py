@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Guardrails for the sync engine's pool configuration.
 
 Regressing any of these silently brings back

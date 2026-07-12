@@ -1,0 +1,45 @@
+zabt.ai
+Copyright (C) 2025-2026 Afeef Janjua
+
+This product is licensed under the GNU Affero General Public License v3.0
+(AGPL-3.0-only). See the LICENSE file for the full license text.
+
+--------------------------------------------------------------------------------
+Trademarks
+--------------------------------------------------------------------------------
+
+"zabt" and "zabt.ai", together with the zabt.ai name and logo, are trademarks of
+Afeef Janjua. The AGPL-3.0 license granted for this software does NOT grant any
+right to use these trademarks, service marks, logos, or the "zabt" / "zabt.ai"
+names, whether registered or unregistered.
+
+You may run, modify, and redistribute this software under the terms of the
+AGPL-3.0. If you distribute a modified version, you must not present it as the
+official "zabt" or "zabt.ai" product, and you must remove or replace the marks in
+a way that does not imply endorsement by or affiliation with Afeef Janjua.
+
+--------------------------------------------------------------------------------
+Commercial licensing
+--------------------------------------------------------------------------------
+
+The AGPL-3.0 requires that any modified version offered over a network make its
+complete corresponding source available to that network's users. Organizations
+that cannot or do not wish to comply with the AGPL-3.0 (for example, to embed
+zabt.ai in a proprietary product or SaaS without releasing their modifications)
+may obtain a separate commercial license.
+
+Commercial licensing enquiries: licensing@zabt.ai
+  (mailbox to be provisioned by the maintainer — see docs/oss-prep/LAUNCH-CHECKLIST.md)
+
+--------------------------------------------------------------------------------
+Third-party components
+--------------------------------------------------------------------------------
+
+This software depends on third-party open-source components, each under its own
+license. See docs/third-party-licenses.md for the dependency license inventory.
+
+NOTE ON MODEL WEIGHTS: zabt.ai integrates with gated machine-learning models
+(notably pyannote speaker-diarization models on Hugging Face). Those model weights
+are NOT part of this repository and are NOT redistributed here. Each user must
+accept the model providers' own terms and download the weights themselves. See the
+README and .env.example (HF_TOKEN) for details.

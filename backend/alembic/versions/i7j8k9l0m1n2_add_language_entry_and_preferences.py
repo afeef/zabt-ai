@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """add language entry and preferences
 
 Revision ID: i7j8k9l0m1n2

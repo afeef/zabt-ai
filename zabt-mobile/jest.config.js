@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 /**
  * Minimal jest config for pure-TS unit tests (chunker, queue, multipart state machine).
  * Avoids jest-expo because its winter runtime pulls in React Native's module system,

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 def test_validate_and_force_keeps_detection_when_in_set():
     from src.pipeline import _resolve_language_after_detect
 

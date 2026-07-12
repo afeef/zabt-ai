@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 def test_language_entry_model_fields():
     from app.models.base import LanguageEntry
     fields = LanguageEntry.model_fields

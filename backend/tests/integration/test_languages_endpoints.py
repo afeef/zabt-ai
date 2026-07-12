@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 def test_list_languages_returns_catalog(client):
     resp = client.get("/api/v1/languages")
     assert resp.status_code == 200

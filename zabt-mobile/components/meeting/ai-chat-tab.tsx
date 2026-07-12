@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import { Text, View } from "react-native";
 import { Sparkles } from "lucide-react-native";
 import type { ComponentType } from "react";

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """drop calendar_event recording columns
 
 The recording_url / recording_source columns were written only by the

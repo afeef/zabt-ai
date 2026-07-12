@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Unified GPU Transcription Client — talks to GPU service via RunPod SDK or HTTP.
 
 Implements the TranscriptionProvider protocol. The backend (RunPod or local HTTP)

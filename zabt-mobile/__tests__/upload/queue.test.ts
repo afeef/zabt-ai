@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 // In-memory mock of AsyncStorage keyed on the mock's lifetime.
 const mockStore = new Map<string, string>();
 

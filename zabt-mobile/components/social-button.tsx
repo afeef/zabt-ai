@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import type { ComponentType } from "react";
 import { Pressable, Text, View } from "react-native";
 import { Mail, Building2 } from "lucide-react-native";

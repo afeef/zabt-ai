@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """RunPod Serverless Handler — Whisper large-v3 + pyannote diarization.
 
 Models are loaded globally so they persist across jobs (warm workers).

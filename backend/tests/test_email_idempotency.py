@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Regression test for ZABT-API-3: Resend idempotency key must vary with body.
 
 Before this fix, the key was ``meeting-{id}-summary`` — stable forever. A

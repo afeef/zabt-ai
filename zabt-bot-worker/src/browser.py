@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Playwright automation — join Teams meetings via the web client.
 
 Uses primary CSS selectors with text-based fallback heuristics

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 from zabt_vision.pipeline.signals.transcript_hints import compute_transcript_hint_signal
 from zabt_vision.types import TranscriptLine
 

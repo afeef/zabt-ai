@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """add missing indexes for meeting.owner_id and transcriptsegment.meeting_id
 
 Revision ID: b3c4d5e6f7a8

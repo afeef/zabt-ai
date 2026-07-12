@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 from pathlib import Path
 
 from zabt_vision.pipeline.signals.scene_detect import compute_scene_signal

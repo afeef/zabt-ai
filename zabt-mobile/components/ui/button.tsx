@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import { cva, type VariantProps } from "class-variance-authority";
 import { ActivityIndicator, Pressable, Text } from "react-native";
 import { cn } from "@/lib/utils";

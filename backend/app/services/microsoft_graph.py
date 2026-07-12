@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Microsoft Graph API client for OAuth token exchange and calendar event fetching.
 
 Handles Microsoft OAuth2 PKCE flow (authorization code grant) and

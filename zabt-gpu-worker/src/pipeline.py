@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """WhisperX Pipeline — shared transcription logic used by both local and RunPod providers.
 
 This module contains the pure transcription pipeline (transcribe → align → diarize)

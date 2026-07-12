@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """End-to-end pipeline integration test.
 
 Runs the FULL pipeline (frame extraction → all four signals → video-native

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import { Badge } from "@/app/components/ui/badge";
 import { cn } from "@/app/lib/utils";
 import type { Meeting } from "@/app/lib/api";

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Centralized logging and Sentry initialization.
 
 Provides get_logger(name) for consistent logging across the GPU worker.

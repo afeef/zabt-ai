@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import "react-native-url-polyfill/auto";
 import "../global.css";
 import "react-native-reanimated";

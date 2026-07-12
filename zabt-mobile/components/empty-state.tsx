@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import type { ComponentType } from "react";
 import { Text, View } from "react-native";
 import { Mic } from "lucide-react-native";

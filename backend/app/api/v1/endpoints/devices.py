@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Device registration endpoints for mobile push notifications."""
 
 from fastapi import APIRouter, Depends, HTTPException, Response

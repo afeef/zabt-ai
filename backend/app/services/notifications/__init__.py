@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Owner notification system.
 
 Exposes a thin notify() function so consuming code never imports a specific

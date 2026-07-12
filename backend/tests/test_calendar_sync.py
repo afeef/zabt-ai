@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Unit tests for CalendarSyncService — platform detection and batch load optimization."""
 
 from datetime import datetime, timezone

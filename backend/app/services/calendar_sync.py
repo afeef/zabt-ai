@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Calendar sync service — fetches events from Microsoft Graph and upserts into CalendarEvent table.
 
 Handles token refresh on 401, detects conferencing platforms, and

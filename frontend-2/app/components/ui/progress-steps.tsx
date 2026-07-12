@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import { clsx } from "clsx";
 import { Loader2 } from "lucide-react";
 import { type UserStage, STAGE_ORDER, STAGE_LABELS, getStageIndex } from "@/app/lib/stage-utils";

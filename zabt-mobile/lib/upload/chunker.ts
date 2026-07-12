@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 /**
  * Pure file-chunking plan. No I/O — this is the spec for the uploader state machine.
  */

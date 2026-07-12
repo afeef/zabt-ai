@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import { File } from "expo-file-system";
 import * as FileSystemLegacy from "expo-file-system/legacy";
 import { api } from "../api";

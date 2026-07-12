@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import { Hero } from "@/components/landing/hero";
 import { FeatureShowcase } from "@/components/landing/feature-showcase";
 import { UseCaseTabs } from "@/components/landing/use-case-tabs";

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Regression tests for Settings class defaults.
 
 These tests lock in the zabt.ai domain defaults so a future edit

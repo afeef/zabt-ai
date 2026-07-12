@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 import { planChunks } from "../../lib/upload/chunker";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB

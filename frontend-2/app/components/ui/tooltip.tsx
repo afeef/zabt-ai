@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 "use client"
 
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"

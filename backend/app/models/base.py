@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 from datetime import datetime
 from typing import Any, Optional, List
 from enum import Enum

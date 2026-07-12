@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2025-2026 Afeef Janjua
 // String literal union types (compile-time only; no runtime cost)
 
 export type MeetingStatus =

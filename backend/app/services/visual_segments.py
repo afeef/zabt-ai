@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """Service layer for VisualSegment persistence and on-read transcript alignment."""
 from dataclasses import dataclass, field
 from typing import List, Optional

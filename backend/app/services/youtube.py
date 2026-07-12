@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2025-2026 Afeef Janjua
 """YouTube URL validation, metadata extraction, and audio download utilities.
 
 Uses yt-dlp CLI via subprocess (stable interface per research decision #2).
