@@ -19,7 +19,7 @@ and an LLM API key.
 ## 2. Configure
 
 ```bash
-git clone https://github.com/<your-org>/zabt-ai.git
+git clone https://github.com/afeef/zabt-ai.git
 cd zabt-ai
 cp .env.example .env
 ```

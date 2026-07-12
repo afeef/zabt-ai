@@ -75,7 +75,7 @@ Please add or update tests for behavior changes.
 
 ## Good first issues
 
-Look for issues labeled [`good first issue`](https://github.com/<your-org>/zabt-ai/labels/good%20first%20issue).
+Look for issues labeled [`good first issue`](https://github.com/afeef/zabt-ai/labels/good%20first%20issue).
 New to the codebase? Documentation fixes, small UI polish, and test coverage are great entry
 points.
 

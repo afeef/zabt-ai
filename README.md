@@ -53,7 +53,7 @@ endpoint. Authentication is delegated to Supabase (a free project works).
 No GPU? See [CPU-only](#cpu-only) below.
 
 ```bash
-git clone https://github.com/<your-org>/zabt-ai.git
+git clone https://github.com/afeef/zabt-ai.git
 cd zabt-ai
 cp .env.example .env
 #   Edit .env and set the 4 REQUIRED values:
