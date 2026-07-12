@@ -12,8 +12,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-revision = "k9l0m1n2o3p4"
-down_revision = "j8k9l0m1n2o3"
+revision = "l0m1n2o3p4q5"
+down_revision = "k9l0m1n2o3p4"
 branch_labels = None
 depends_on = None
 
