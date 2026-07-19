@@ -1,0 +1,15 @@
+{
+  "brandTerms": ["zabt", "zabt.ai"],
+  "brandDomain": "zabt.ai",
+  "competitors": ["otter", "fireflies", "fathom", "tldv", "read.ai", "granola"],
+  "questions": [
+    "What is the best self-hosted alternative to Otter.ai?",
+    "What is an open source alternative to Fireflies.ai?",
+    "How can I transcribe meetings privately without sending audio to a third party?",
+    "What is the best on-premise meeting transcription tool?",
+    "Which AI meeting notes tool can I self-host with Docker?",
+    "What meeting transcription software keeps my data on my own servers?",
+    "Is there a HIPAA-friendly self-hosted meeting transcription option?",
+    "What is a privacy-first alternative to Read.ai or Granola?"
+  ]
+}

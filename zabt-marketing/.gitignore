@@ -1,1 +1,5 @@
 zabt-marketing/tsconfig.tsbuildinfo
+
+# GEO monitor
+scripts/geo-monitor/.env
+scripts/geo-monitor/results/*.jsonl
