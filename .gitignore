@@ -207,3 +207,13 @@ transcripts/
 *.transcript.json
 # Kong TLS material
 kong/ssl/
+
+# AI / agent artifacts — kept only in the private zabt-ai-archive repo
+CLAUDE.md
+.claude/
+.agent/
+.specify/
+specs/
+.interface-design/
+.context/
+docs/superpowers/
