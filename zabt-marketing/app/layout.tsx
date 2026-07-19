@@ -7,6 +7,10 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { ClarityProvider } from "@/components/analytics/clarity-provider";
+import { siteConfig } from "@/lib/seo/config";
+import { JsonLd } from "@/components/seo/json-ld";
+import { organizationSchema, softwareApplicationSchema } from "@/lib/seo/json-ld";
+import { tiers } from "@/content/pricing";
 import "./globals.css";
 
 const inter = Inter({
@@ -20,9 +24,29 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zabt AI — AI Meeting Notes",
-  description:
-    "Upload any recording. Get transcripts, summaries, and action items in minutes.",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.title,
+    template: "%s — zabt.ai",
+  },
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
+  alternates: { canonical: "/" },
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    siteName: siteConfig.name,
+    url: siteConfig.url,
+    title: siteConfig.title,
+    description: siteConfig.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+  },
+  // Fill tokens when GSC / Bing are verified:
+  // verification: { google: "GSC_TOKEN", other: { "msvalidate.01": "BING_TOKEN" } },
 };
 
 export default function RootLayout({
@@ -35,6 +59,8 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
+        <JsonLd data={organizationSchema()} />
+        <JsonLd data={softwareApplicationSchema(tiers)} />
         <GoogleAnalytics />
         <ClarityProvider />
         <AlphaBanner />
