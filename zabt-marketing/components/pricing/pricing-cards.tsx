@@ -32,9 +32,9 @@ export function PricingCards({ tiers }: { tiers: PricingTier[] }) {
                   </div>
                 )}
 
-                <h3 className="text-lg font-semibold text-stone-900 mb-1">
+                <h2 className="text-lg font-semibold text-stone-900 mb-1">
                   {tier.name}
-                </h3>
+                </h2>
                 <p className="text-sm text-stone-500 mb-4">{tier.description}</p>
 
                 {/* Price */}

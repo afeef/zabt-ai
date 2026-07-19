@@ -7,9 +7,9 @@ import type { Feature } from "@/content/types";
 function FeatureSection({ feature }: { feature: Feature }) {
   const textSide = (
     <div className="flex flex-col justify-center">
-      <h3 className="text-xl font-semibold text-stone-900 mb-3">
+      <h2 className="text-xl font-semibold text-stone-900 mb-3">
         {feature.title}
-      </h3>
+      </h2>
       <p className="text-base text-stone-600 leading-relaxed mb-4">
         {feature.description}
       </p>
