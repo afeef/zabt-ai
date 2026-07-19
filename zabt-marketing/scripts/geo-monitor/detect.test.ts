@@ -40,4 +40,26 @@ describe("detect", () => {
     expect(r.mentioned).toBe(false);
     expect(r.competitorsMentioned).toEqual(["granola"]);
   });
+
+  it("does not count a look-alike/decoy domain as a citation", () => {
+    const r = detect({ ...base, text: "Zabt is great. Full review at https://notzabt.ai/review123" });
+    expect(r.mentioned).toBe(true);
+    expect(r.cited).toBe(false);
+  });
+
+  it("does not count the brand domain used as a prefix label of another domain", () => {
+    const r = detect({ ...base, text: "Beware https://zabt.ai.phishing.com/deal — Zabt lookalikes exist." });
+    expect(r.cited).toBe(false);
+  });
+
+  it("counts a real subdomain of the brand as a citation", () => {
+    const r = detect({ ...base, text: "Sign in at https://app.zabt.ai/login" });
+    expect(r.mentioned).toBe(true);
+    expect(r.cited).toBe(true);
+  });
+
+  it("counts a bare brand-domain mention (no protocol) as a citation", () => {
+    const r = detect({ ...base, text: "Just go to zabt.ai for details." });
+    expect(r.cited).toBe(true);
+  });
 });

@@ -29,7 +29,13 @@ export function detect(input: DetectionInput): Detection {
   const mentioned = input.brandTerms.some((t) => wordPresent(text, t));
 
   const domain = escapeRegExp(input.brandDomain.toLowerCase());
-  const cited = new RegExp(`https?://[^\\s)]*${domain}|(^|[^a-z0-9])${domain}/`).test(text);
+  // Match the brand domain as a real host (exact or a subdomain of it), optionally
+  // with protocol/path/port/query — but NOT as a suffix of a longer label
+  // (e.g. "notzabt.ai") nor as a prefix label of another domain ("zabt.ai.evil.com").
+  const host = `(?:[a-z0-9-]+\\.)*${domain}`;
+  const cited = new RegExp(
+    `(?:^|[\\s/@(])(?:https?://)?${host}(?=[/:?#)]|\\.?(?:\\s|$))`,
+  ).test(text);
 
   const competitorsMentioned = Array.from(
     new Set(input.competitors.filter((c) => wordPresent(text, c))),
