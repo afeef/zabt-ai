@@ -49,7 +49,6 @@ services:
       TRANSCRIPTION_BACKEND: ${TRANSCRIPTION_BACKEND:-runpod}
       STORAGE_PROVIDER: ${STORAGE_PROVIDER:-s3}
       SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
-      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-}
 
   worker:
     environment:
@@ -58,5 +57,9 @@ services:
       SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
 
   beat:
+    # Same cloud overrides as worker (beat runs the same image + app.worker graph).
+    # The full S3/OpenAI/etc. env now lives on the base beat service.
     environment:
+      TRANSCRIPTION_BACKEND: ${TRANSCRIPTION_BACKEND:-runpod}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-s3}
       SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
