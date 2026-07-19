@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1584" height="396" viewBox="0 0 1584 396">
+   <rect width="1584" height="396" fill="#0c0a09"/>
+   <g transform="translate(111,75) scale(0.615)">
+    <defs>
+      <linearGradient id="mbg111" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#292524"/><stop offset="1" stop-color="#0c0a09"/></linearGradient>
+      <linearGradient id="mz111" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#F5386A"/><stop offset="1" stop-color="#E11D48"/></linearGradient>
+    </defs>
+    <rect width="400" height="400" rx="92" fill="url(#mbg111)"/>
+    <path d="M120 150 H280 L120 250 H280" fill="none" stroke="url(#mz111)" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+   <text x="452" y="222.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="135" font-weight="700" letter-spacing="-1">
+     <tspan fill="#faf7f5">zabt</tspan><tspan fill="#E11D48">.ai</tspan></text>
+   <text x="455" y="338.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="46" font-weight="500" letter-spacing="0.5" fill="#a8a29e">Self-hosted AI meeting intelligence</text></svg>

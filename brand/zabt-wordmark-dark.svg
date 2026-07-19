@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="280" viewBox="0 0 1000 280">
+   
+   <g transform="translate(78,53) scale(0.435)">
+    <defs>
+      <linearGradient id="mbg78" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c1917"/><stop offset="1" stop-color="#0c0a09"/></linearGradient>
+      <linearGradient id="mz78" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#F5386A"/><stop offset="1" stop-color="#E11D48"/></linearGradient>
+    </defs>
+    <rect width="400" height="400" rx="92" fill="url(#mbg78)"/>
+    <path d="M120 150 H280 L120 250 H280" fill="none" stroke="url(#mz78)" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+   <text x="319" y="174.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="95" font-weight="700" letter-spacing="-1">
+     <tspan fill="#faf7f5">zabt</tspan><tspan fill="#E11D48">.ai</tspan></text>
+   </svg>
