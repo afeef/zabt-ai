@@ -42,6 +42,12 @@ app.add_middleware(AuditMiddleware)
 if settings.LOGFIRE_TOKEN:
     import logfire
     from app.db.engine import engine
+    from app.core import otel_patch
+
+    # OTEL's FastAPI route extraction crashes on Starlette 1.x included routers
+    # (see app/core/otel_patch.py). Patch it BEFORE instrumenting so request
+    # tracing works instead of 500-ing on routes like /api/v1/meetings/.
+    otel_patch.apply()
 
     logfire.instrument_fastapi(app)
     logfire.instrument_sqlalchemy(engine=engine)
