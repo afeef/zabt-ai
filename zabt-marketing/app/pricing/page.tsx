@@ -10,15 +10,20 @@ import { ComparisonTable } from "@/components/pricing/comparison-table";
 import { Faq } from "@/components/pricing/faq";
 import { CtaBanner } from "@/components/layout/cta-banner";
 import { tiers, featureMatrix, faqItems } from "@/content/pricing";
+import { JsonLd } from "@/components/seo/json-ld";
+import { faqPageSchema, breadcrumbSchema } from "@/lib/seo/json-ld";
 
 export const metadata: Metadata = {
-  title: "Pricing — Zabt AI",
+  title: "Pricing",
   description: "Choose the plan that fits your needs. Start free, scale as you grow.",
+  alternates: { canonical: "/pricing" },
 };
 
 export default function PricingPage() {
   return (
     <PricingProvider>
+      <JsonLd data={faqPageSchema(faqItems)} />
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Pricing", path: "/pricing" }])} />
       <PricingHeader />
       <PricingCards tiers={tiers} />
       <ComparisonTable matrix={featureMatrix} tiers={tiers} />
