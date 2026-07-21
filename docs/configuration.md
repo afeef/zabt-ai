@@ -8,7 +8,7 @@ and notes which are required. Values marked **REQUIRED** must be set for a worki
 
 | Variable | Default | Notes |
 |----------|---------|-------|
-| `COMPOSE_PROFILES` | `local` | `local` = bundled db+minio+gpu+web. Add `bot`/`vision` for add-ons. Empty for the cloud split. |
+| `COMPOSE_PROFILES` | `local` | `local` = bundled db+minio+gpu+web. Add `vision` for add-ons. Empty for the cloud split. |
 
 ## Database
 
@@ -86,7 +86,6 @@ and notes which are required. Values marked **REQUIRED** must be set for a worki
 |----------|-------|
 | `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET` / `MICROSOFT_TENANT_ID` / `MICROSOFT_REDIRECT_URI` | Microsoft/Teams OAuth. |
 | `TOKEN_ENCRYPTION_KEY` | Fernet key encrypting stored OAuth tokens. **Required if you enable integrations.** Generate: `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` |
-| `BOT_DISPLAY_NAME` / `BOT_WORKER_URL` | Teams meeting bot (profile `bot`). |
 | `RESEND_API_KEY` / `RESEND_FROM_EMAIL` | Transactional email (Resend). |
 | `NOTIFICATION_PROVIDER` / `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | Notifications. |
 

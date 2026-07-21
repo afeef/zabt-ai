@@ -71,7 +71,6 @@ runs `int8` compute automatically and is roughly 1-5× real-time.
 
 Enable by editing `COMPOSE_PROFILES` in `.env` (comma-separated):
 
-- `COMPOSE_PROFILES=local,bot` — Microsoft Teams meeting bot (headless browser).
 - `COMPOSE_PROFILES=local,vision` — visual breakdown worker (needs an Ollama host serving
   the vision model; set `OLLAMA_HOST`).
 

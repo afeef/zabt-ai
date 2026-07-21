@@ -74,7 +74,6 @@ services:
       NOTIFICATION_PROVIDER: ${NOTIFICATION_PROVIDER:-}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
-      BOT_WORKER_URL: ${BOT_WORKER_URL:-http://worker-bot:8002}
       # Observability (all optional)
       POSTHOG_API_KEY: ${POSTHOG_API_KEY:-}
       POSTHOG_HOST: ${POSTHOG_HOST:-https://us.i.posthog.com}
@@ -138,7 +137,6 @@ services:
       MICROSOFT_TENANT_ID: ${MICROSOFT_TENANT_ID:-common}
       MICROSOFT_REDIRECT_URI: ${MICROSOFT_REDIRECT_URI:-http://localhost:8000/api/v1/integrations/microsoft/callback}
       TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY:-}
-      BOT_WORKER_URL: ${BOT_WORKER_URL:-http://worker-bot:8002}
       POSTHOG_API_KEY: ${POSTHOG_API_KEY:-}
       POSTHOG_HOST: ${POSTHOG_HOST:-https://us.i.posthog.com}
       SENTRY_DSN: ${SENTRY_DSN:-}
@@ -158,23 +156,58 @@ services:
       dockerfile: Dockerfile
       target: worker
     command: celery -A app.worker.celery_app beat --loglevel=info
+    # beat runs the same image and imports the same app.worker module graph as
+    # worker, which constructs storage + LLM clients at import time. It therefore
+    # needs the SAME environment as worker (kept in sync with the worker block above).
     environment:
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: redis://redis:6379/0
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://openrouter.ai/api/v1}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-google/gemini-3.1-flash-lite-preview}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
       APP_URL: ${APP_URL:-http://localhost:3000}
       STORAGE_PROVIDER: ${STORAGE_PROVIDER:-minio}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
       MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-zabt-ai-bucket}
+      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-zabt-ai-bucket}
+      S3_PUBLIC_URL: ${S3_PUBLIC_URL:-}
+      S3_REGION: ${S3_REGION:-auto}
+      # Transcription backend: "gpu-local" (bundled worker-gpu) or "runpod"
+      TRANSCRIPTION_BACKEND: ${TRANSCRIPTION_BACKEND:-gpu-local}
+      GPU_SERVICE_URL: ${GPU_SERVICE_URL:-http://worker-gpu:8001}
+      RUNPOD_API_KEY: ${RUNPOD_API_KEY:-}
+      RUNPOD_ENDPOINT_ID: ${RUNPOD_ENDPOINT_ID:-}
+      RUNPOD_POLL_INTERVAL: ${RUNPOD_POLL_INTERVAL:-5}
+      RUNPOD_TIMEOUT: ${RUNPOD_TIMEOUT:-1800}
+      # Vision (visual breakdown) backend: "local" or "runpod"
+      VISION_BACKEND: ${VISION_BACKEND:-local}
+      VISION_LOCAL_URL: ${VISION_LOCAL_URL:-http://zabt-vision-worker:8003}
+      VISION_RUNPOD_API_KEY: ${VISION_RUNPOD_API_KEY:-}
+      VISION_RUNPOD_ENDPOINT_ID: ${VISION_RUNPOD_ENDPOINT_ID:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-no-reply@zabt.ai}
+      NOTIFICATION_PROVIDER: ${NOTIFICATION_PROVIDER:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
       MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID:-}
       MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET:-}
       MICROSOFT_TENANT_ID: ${MICROSOFT_TENANT_ID:-common}
       MICROSOFT_REDIRECT_URI: ${MICROSOFT_REDIRECT_URI:-http://localhost:8000/api/v1/integrations/microsoft/callback}
       TOKEN_ENCRYPTION_KEY: ${TOKEN_ENCRYPTION_KEY:-}
-      BOT_WORKER_URL: ${BOT_WORKER_URL:-http://worker-bot:8002}
+      POSTHOG_API_KEY: ${POSTHOG_API_KEY:-}
+      POSTHOG_HOST: ${POSTHOG_HOST:-https://us.i.posthog.com}
       SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-development}
       LOGFIRE_TOKEN: ${LOGFIRE_TOKEN:-}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+      LANGFUSE_HOST: ${LANGFUSE_HOST:-https://cloud.langfuse.com}
     depends_on:
       - redis
 
@@ -281,36 +314,6 @@ services:
       - api
 
   # ---- Optional add-ons ----
-  # Teams meeting bot (headless browser). Enable by adding "bot" to COMPOSE_PROFILES.
-  worker-bot:
-    image: zabt-bot-worker:latest
-    restart: unless-stopped
-    profiles: [bot]
-    shm_size: "2gb"
-    build:
-      context: ./zabt-bot-worker
-    environment:
-      PORT: 8002
-      WORKER_ID: bot-worker-1
-      BOT_DISPLAY_NAME: ${BOT_DISPLAY_NAME:-Zabt AI Notetaker}
-      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-minio}
-      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
-      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-zabt-ai-bucket}
-      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
-      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
-      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
-      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-zabt-ai-bucket}
-      S3_REGION: ${S3_REGION:-auto}
-      SENTRY_DSN: ${SENTRY_DSN:-}
-      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-development}
-      LOGFIRE_TOKEN: ${LOGFIRE_TOKEN:-}
-      POSTHOG_API_KEY: ${POSTHOG_API_KEY:-}
-      POSTHOG_HOST: ${POSTHOG_HOST:-https://us.i.posthog.com}
-    depends_on:
-      - redis
-
   # Visual breakdown worker (needs an Ollama host for the vision model).
   # Enable by adding "vision" to COMPOSE_PROFILES.
   zabt-vision-worker:

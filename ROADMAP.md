@@ -15,8 +15,8 @@ Tracking feature requests, priorities, and implementation progress.
 | 7 | Observability upgrade (Sentry + Langfuse) | `024-sentry-langfuse` | 2026-03 |
 | 8 | GPU worker extraction | `025-gpu-worker-extraction` | 2026-03 |
 | 9 | Medical transcription (MedASR) | `026-medical-transcription` | 2026-03 |
-| 10 | Microsoft Integration (Phase 1-3): OAuth, calendar sync, recording pickup, email summaries | `main` | 2026-04 |
-| 11 | Microsoft Integration (Phase 4): Teams bot worker (headless browser) | `main` | 2026-04 |
+| 10 | Microsoft Integration (Phase 1-3): OAuth, ~~calendar sync, recording pickup~~, email summaries — _calendar sync + recording pickup removed 2026-07; OAuth + email summaries retained_ | `main` | 2026-04 |
+| 11 | ~~Microsoft Integration (Phase 4): Teams bot worker (headless browser)~~ — _removed 2026-07 (`zabt-bot-worker` + `calendarevent`/`botjob` tables dropped)_ | `main` | 2026-04 |
 | 12 | Meeting Intelligence Phase 1: structured output, action items, chapters, highlights | `feat/headless-browser-bot` | 2026-04 |
 | 13 | Meeting detail page redesign: toolbar bars, decluttered header | `main` | 2026-04 |
 | 14 | Microsoft social login via Supabase | `feat/microsoft-social-auth` | 2026-04 |
@@ -50,10 +50,10 @@ Tracking feature requests, priorities, and implementation progress.
 | 14 | AI Chat over meetings (RAG or long context) | Medium | Chat over transcripts/summaries. Two approaches to evaluate: (a) RAG via Qdrant embeddings + retrieval, (b) long-context window — stuff full transcripts directly into prompt. Could hybrid: long context for single-meeting chat, RAG for cross-meeting search. |
 | 15 | Admin control plane dashboard | Medium | Internal admin dashboard showing all user activity, meetings processed (total/per-user), credits used/remaining, system health metrics. Separate admin route with auth guard. Backend aggregation queries + frontend dashboard with tables and summary cards. |
 | 16 | Credits/usage pricing system | Medium | Usage tracking, credit purchase, rate limiting |
-| 17 | Google Calendar + Meet integration | Medium | Same provider-agnostic pattern as Microsoft — OAuth, calendar sync, headless browser bot for Meet |
-| 18 | Zoom integration | Medium | Zoom Meeting SDK for bot join + audio capture, calendar sync via Zoom OAuth |
+| 17 | Google Calendar + Meet integration | Medium | Provider-agnostic OAuth + calendar sync + headless-browser bot for Meet. NOTE: the Microsoft calendar-sync + `zabt-bot-worker` reference implementation was removed 2026-07 — this would rebuild that scaffolding, not extend it. |
+| 18 | Zoom integration | Medium | Zoom Meeting SDK for bot join + audio capture, calendar sync via Zoom OAuth. (Bot/calendar scaffolding removed 2026-07 — would start fresh.) |
 | 19 | MSP multi-tenant admin | Large | Org/tenant model, RBAC, admin dashboard, cross-meeting analytics |
-| 20 | **Microsoft Graph webhook subscriptions** — replace the no-op `renew_graph_subscriptions` task with a real implementation. Requires: (a) pass correct args to `MicrosoftGraphClient.create_subscription` (access_token, notification_url derived from APP_URL, resource paths like `/me/drive/root` + `/me/events`), (b) persist subscription IDs on the `Integration` model so renewal uses PATCH instead of always creating new, (c) validate `clientState` in the webhook handler at `backend/app/api/v1/endpoints/webhooks.py`, (d) handle Graph subscription expiration (max 4230 minutes per call). | Medium | Polling handles calendar + recording sync today (every 5 min). This is a latency optimization (webhooks ~1s vs polling 5min), not a correctness fix. Low priority until real user load justifies it. |
+| 20 | ~~**Microsoft Graph webhook subscriptions**~~ — **obsolete (2026-07):** premised on the calendar/recording polling that was removed with the calendar feature. Would only be revived if calendar sync is rebuilt. | — | Referenced a `renew_graph_subscriptions` task / `MicrosoftGraphClient.create_subscription` that no longer exist. |
 
 ## User Requests (Unsorted)
 
@@ -67,7 +67,7 @@ New feature requests from users go here. Move them to Backlog once prioritized.
 | 2026-04-10 | Multiple integrations per provider (multi-account) | User | High | **Re-raised 2026-04-16** — users explicitly asking for this. Allow multiple Microsoft integrations per user (personal, work, school accounts). Currently limited to one integration per provider. Requires lifting unique constraint on (owner_id, provider), UI for managing multiple connected accounts. |
 | 2026-04-10 | OpenRouter-style topup and usage billing | Internal | Large | Prepaid minutes model: users buy minute packs, each transcription deducts from balance. Requires: balance/transaction model, payment integration (Stripe checkout already exists), usage enforcement (block processing when balance is zero), usage dashboard with history. Similar to OpenRouter's credit system. |
 | 2026-04-16 | Language preferences for transcription and summaries | User | High | Per-user language setting: transcription language (Whisper supports ~100; Chirp supports 100+) + summary output language. Surfaces as a settings dropdown and per-meeting override. Smallest feature on this list, unblocks all non-English users. Backend: add `language` column to user + meeting, pass through to transcription provider and LLM prompt. |
-| 2026-04-16 | Google Meet bot (audio capture) | User | Medium | Join Google Meet meetings as a bot and capture audio — parallel to existing Teams bot. Existing `zabt-bot-worker` architecture reusable. Google Meet has no official bot SDK, likely requires headless browser (same as Teams headless bot path). Tied to calendar integration #17. |
+| 2026-04-16 | Google Meet bot (audio capture) | User | Medium | Join Google Meet meetings as a bot and capture audio. NOTE: the Teams bot / `zabt-bot-worker` was removed 2026-07, so this would rebuild the headless-browser bot from scratch (no official Meet bot SDK). Tied to calendar integration #17. |
 | 2026-04-16 | Zoom bot (audio capture) | User | Medium | Zoom Meeting SDK supports bot join natively (unlike Meet). Cleaner technical path than Meet. Covered by backlog #18 — users are now explicitly asking for it. |
 
 ---

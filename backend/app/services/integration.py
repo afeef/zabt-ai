@@ -119,17 +119,6 @@ class IntegrationService(BaseService):
             )
             return session.exec(statement).first()
 
-    def get_all_active_by_provider(
-        self, provider: IntegrationProvider
-    ) -> List[Integration]:
-        """Get all active integrations for a provider (used by Celery sync tasks)."""
-        with Session(engine) as session:
-            statement = select(Integration).where(
-                Integration.provider == provider,
-                Integration.status == IntegrationStatus.ACTIVE,
-            )
-            return list(session.exec(statement).all())
-
     def disconnect(self, user_id: int, provider: IntegrationProvider) -> bool:
         """Delete an integration (disconnect)."""
         with Session(engine) as session:

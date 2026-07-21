@@ -1,23 +1,21 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # Copyright (C) 2025-2026 Afeef Janjua
-"""Integration endpoints — connect/disconnect OAuth providers, calendar events."""
+"""Integration endpoints — connect/disconnect OAuth providers."""
 
 import secrets
-from typing import Any, List
+from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import RedirectResponse
 
 from app.api.deps import get_current_active_user
 from app.core.config import settings
 from app.models import User
-from app.models.calendar_event import CalendarEventRead, CalendarEventUpdate
 from app.models.integration import (
     IntegrationConnectResponse,
     IntegrationProvider,
     IntegrationRead,
 )
-from app.services.calendar_sync import calendar_sync_service
 from app.services.integration import integration_service
 from app.services.microsoft_graph import MicrosoftGraphClient
 
@@ -140,45 +138,3 @@ def disconnect_provider(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Integration not found",
         )
-
-
-# ── Calendar events ─────────────────────────────────────────────────────────
-
-@router.get("/calendar/events", response_model=List[CalendarEventRead])
-def list_calendar_events(user: User = Depends(get_current_active_user)):
-    """Return upcoming calendar events for the current user."""
-    return calendar_sync_service.get_events_for_user(user.id)
-
-
-@router.patch("/calendar/events/{event_id}", response_model=CalendarEventRead)
-def update_calendar_event(
-    event_id: int,
-    body: CalendarEventUpdate,
-    user: User = Depends(get_current_active_user),
-):
-    """Toggle auto_join for a calendar event."""
-    if body.auto_join is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No update fields provided",
-        )
-
-    event = calendar_sync_service.update_auto_join(event_id, user.id, body.auto_join)
-    if not event:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Calendar event not found",
-        )
-    return event
-
-
-# ── Bot callback ───────────────────────────────────────────────────────────
-
-@router.post("/bot-callback")
-async def bot_callback(request: Request) -> Any:
-    """Handle callback from bot worker when a meeting recording ends."""
-    from app.services.bot_orchestration import bot_orchestration_service
-
-    body = await request.json()
-    bot_orchestration_service.handle_callback(body)
-    return {"status": "ok"}

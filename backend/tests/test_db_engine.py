@@ -28,3 +28,28 @@ def test_echo_disabled_in_production_config() -> None:
         "echo must be False — SQL statement logging belongs to Logfire/Sentry, "
         "not SQLAlchemy's debug echo."
     )
+
+
+from app.db.engine import _connect_args
+
+
+def test_tcp_keepalives_configured() -> None:
+    # Keepalives make a half-open (silently reaped) socket surface as
+    # OperationalError instead of blocking recv() forever — the primary
+    # guard against the 2026-07-21 sync_calendars hang.
+    assert _connect_args.get("keepalives") == 1
+    assert _connect_args.get("keepalives_idle") == 30
+    assert _connect_args.get("keepalives_interval") == 10
+    assert _connect_args.get("keepalives_count") == 3
+
+
+def test_connect_timeout_configured() -> None:
+    assert _connect_args.get("connect_timeout") == 10
+
+
+def test_no_startup_options_packet() -> None:
+    # idle_in_transaction_session_timeout was intentionally NOT delivered via the
+    # libpq startup `options` packet: on the shared app engine a Supavisor
+    # rejection would fail every connection app-wide. If a server-side timeout is
+    # ever reintroduced, it must be a post-connect SET, not a startup option.
+    assert "options" not in _connect_args
