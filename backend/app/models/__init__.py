@@ -45,23 +45,6 @@ from app.models.email_share import (
     EmailShareCreate,
 )
 
-# Re-export new calendar event models
-from app.models.calendar_event import (
-    ConferencingPlatform,
-    BotStatus,
-    CalendarEvent,
-    CalendarEventRead,
-    CalendarEventUpdate,
-)
-
-# Re-export bot job models
-from app.models.bot_job import (
-    BotJobStatus,
-    BotJobInfra,
-    BotJob,
-    BotJobRead,
-)
-
 # Re-export device models
 from app.models.device import (
     Device,
@@ -106,17 +89,6 @@ __all__ = [
     "EmailShare",
     "EmailShareRead",
     "EmailShareCreate",
-    # calendar_event
-    "ConferencingPlatform",
-    "BotStatus",
-    "CalendarEvent",
-    "CalendarEventRead",
-    "CalendarEventUpdate",
-    # bot_job
-    "BotJobStatus",
-    "BotJobInfra",
-    "BotJob",
-    "BotJobRead",
     # device
     "Device",
     "DeviceCreate",

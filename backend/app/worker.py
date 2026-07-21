@@ -593,49 +593,6 @@ def stage_extract_intelligence(meeting_id: int) -> int:
     return meeting_id
 
 
-# ── Calendar sync (Celery Beat) ──────────────────────────────────────────────
-
-@celery_app.task(name="sync_calendars", ignore_result=True)
-def sync_calendars() -> None:
-    import asyncio
-    from collections import defaultdict
-
-    from app.models.calendar_event import CalendarEvent
-    from app.models.integration import IntegrationProvider
-    from app.services.integration import integration_service
-    from app.services.calendar_sync import calendar_sync_service
-
-    integrations = integration_service.get_all_active_by_provider(IntegrationProvider.MICROSOFT)
-    logger.info("sync_calendars: found %d active Microsoft integrations", len(integrations))
-    if not integrations:
-        return
-
-    # Single session + one batch query across all integrations instead of
-    # re-querying per integration (ZABT-API-1Z).
-    with Session(engine) as session:
-        integration_ids = [i.id for i in integrations]
-        existing_by_integration: dict[int, list[CalendarEvent]] = defaultdict(list)
-        for ev in session.exec(
-            select(CalendarEvent).where(
-                CalendarEvent.integration_id.in_(integration_ids)
-            )
-        ).all():
-            existing_by_integration[ev.integration_id].append(ev)
-
-        for integration in integrations:
-            try:
-                count = asyncio.run(
-                    calendar_sync_service.sync_for_integration(
-                        integration,
-                        session=session,
-                        existing_events=existing_by_integration.get(integration.id, []),
-                    )
-                )
-                logger.info("sync_calendars: synced %d events for integration %s", count, integration.id)
-            except Exception:
-                logger.exception("sync_calendars: failed for integration %s", integration.id)
-
-
 # ── Email share task ────────────────────────────────────────────────────────
 
 @celery_app.task(name="send_meeting_summary_emails", ignore_result=True)
@@ -653,56 +610,6 @@ def send_meeting_summary_emails(
     asyncio.run(
         email_share_service.send_to_recipients(meeting_id, user_id, recipient_emails)
     )
-
-
-@celery_app.task(name="dispatch_meeting_bots", ignore_result=True)
-def dispatch_meeting_bots() -> None:
-    """Check for upcoming meetings with auto_join=True and dispatch bots."""
-    import asyncio
-    from datetime import datetime, timedelta
-    from app.models.calendar_event import CalendarEvent, BotStatus
-    from app.services.bot_orchestration import bot_orchestration_service
-
-    # Use naive UTC to match DB storage (Graph API datetimes stored without tzinfo)
-    now = datetime.utcnow()
-    # Dispatch for meetings starting within next 2 min OR already started up to 5 min ago
-    window_start = now - timedelta(minutes=5)
-    window_end = now + timedelta(minutes=2)
-
-    with Session(engine) as session:
-        # Dispatch any auto_join event in the time window that isn't already
-        # completed or currently being recorded. This avoids the idle/scheduled
-        # status dance — failed attempts auto-retry on the next cycle.
-        events = session.exec(
-            select(CalendarEvent).where(
-                CalendarEvent.auto_join == True,  # noqa: E712
-                CalendarEvent.bot_status == BotStatus.IDLE,
-                CalendarEvent.start_time >= window_start,
-                CalendarEvent.start_time <= window_end,
-                CalendarEvent.join_url.isnot(None),
-                CalendarEvent.meeting_id.is_(None),  # not already transcribed
-            )
-        ).all()
-
-        # Copy needed data before session closes (avoid DetachedInstanceError)
-        event_ids = [ev.id for ev in events]
-
-    logger.warning(
-        "dispatch_meeting_bots: found %d events to dispatch (window=%s to %s)",
-        len(event_ids), window_start.isoformat(), window_end.isoformat(),
-    )
-
-    for event_id in event_ids:
-        try:
-            # Re-load event inside dispatch_bot's own session
-            with Session(engine) as session:
-                event = session.get(CalendarEvent, event_id)
-                if event:
-                    asyncio.run(bot_orchestration_service.dispatch_bot(event))
-        except Exception:
-            logger.exception(
-                "dispatch_meeting_bots: failed for event %s", event_id
-            )
 
 
 @celery_app.task(name="cleanup_abandoned_uploads", ignore_result=True)
@@ -895,14 +802,6 @@ def _finalize_visual_breakdown_failure(
 
 
 celery_app.conf.beat_schedule = {
-    "sync-calendars-every-5-min": {
-        "task": "sync_calendars",
-        "schedule": 300.0,
-    },
-    "dispatch-bots-every-minute": {
-        "task": "dispatch_meeting_bots",
-        "schedule": 60.0,
-    },
     "cleanup-abandoned-uploads-daily": {
         "task": "cleanup_abandoned_uploads",
         "schedule": 86400.0,

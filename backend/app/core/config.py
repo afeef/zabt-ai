@@ -125,9 +125,6 @@ class Settings(BaseSettings):
     # Token encryption key (Fernet — generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
     TOKEN_ENCRYPTION_KEY: str = ""
 
-    # Bot Worker
-    BOT_WORKER_URL: str = "http://worker-bot:8002"
-
     # Comma-separated list of allowed CORS origins
     BACKEND_CORS_ORIGINS: str = "http://localhost:3000"
 

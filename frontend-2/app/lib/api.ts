@@ -332,22 +332,6 @@ export interface IntegrationRead {
   scopes: string[];
 }
 
-export interface CalendarEventRead {
-  id: number;
-  provider: string;
-  external_event_id: string;
-  title: string;
-  start_time: string;
-  end_time: string;
-  conferencing_platform: "teams" | "meet" | "zoom" | null;
-  join_url: string | null;
-  organizer_email: string | null;
-  attendees: { email: string; name: string }[];
-  auto_join: boolean;
-  bot_status: string;
-  meeting_id: number | null;
-}
-
 export const getIntegrations = async (): Promise<IntegrationRead[]> => {
   const { data } = await apiClient.get("/integrations/");
   return data;
@@ -360,19 +344,6 @@ export const connectProvider = async (provider: string): Promise<{ auth_url: str
 
 export const disconnectProvider = async (provider: string): Promise<void> => {
   await apiClient.delete(`/integrations/${provider}`);
-};
-
-export const getCalendarEvents = async (): Promise<CalendarEventRead[]> => {
-  const { data } = await apiClient.get("/integrations/calendar/events");
-  return data;
-};
-
-export const updateCalendarEvent = async (
-  eventId: number,
-  updates: { auto_join?: boolean }
-): Promise<CalendarEventRead> => {
-  const { data } = await apiClient.patch(`/integrations/calendar/events/${eventId}`, updates);
-  return data;
 };
 
 // ── Email Sharing ───────────────────────────────────────────────────────────

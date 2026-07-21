@@ -21,18 +21,6 @@ services:
           error_code: 429
           error_message: "Rate limit exceeded. Please retry after the indicated delay."
 
-  # Bot Worker — Teams meeting bot
-  - name: worker-bot-service
-    url: http://worker-bot:8002
-    routes:
-      - name: worker-bot-route
-        hosts:
-          - bot.zabt.ai
-        paths:
-          - /
-        strip_path: false
-        preserve_host: true
-
   # MinIO object storage — presigned upload/download URL proxy.
   # Host-agnostic so presigned URLs signed against either old or new host
   # remain valid. preserve_host: true keeps the S3 V4 HMAC signature intact.

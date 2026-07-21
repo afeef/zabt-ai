@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config, create_async_engine
 from alembic import context
 from app.core.config import settings
 from sqlmodel import SQLModel
-from app.models import User, Meeting, Integration, CalendarEvent  # Import models to register them
+from app.models import User, Meeting, Integration  # Import models to register them
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
